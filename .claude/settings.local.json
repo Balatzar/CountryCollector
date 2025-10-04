@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(godot:*)"
+      "Bash(godot:*)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script GameState.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/wold_and_ui.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/clickable_world.gd)"
     ],
     "deny": [],
     "ask": []

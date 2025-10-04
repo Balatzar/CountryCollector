@@ -101,7 +101,12 @@ func _parse_and_render_countries():
 		if country_id != "":
 			_create_country_sprite(country_id, path_data, viewbox)
 
+	GameState.notify_countries_loaded()
+
 func _create_country_sprite(country_id: String, path_data: String, viewbox: Rect2):
+	# Add country to GameState
+	GameState.add_country(country_id)
+
 	# Create a minimal SVG for just this country
 	var country_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s %s %s %s"><path d="%s" fill="#cccccc" stroke="black" stroke-width="0.2"/></svg>' % [
 		viewbox.position.x, viewbox.position.y, viewbox.size.x, viewbox.size.y,
@@ -145,5 +150,5 @@ func _create_country_sprite(country_id: String, path_data: String, viewbox: Rect
 func _on_country_input_event(_viewport: Node, event: InputEvent, _shape_idx: int, country_id: String):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			GameState.collect_country(country_id)
 			country_clicked.emit(country_id)
-			print(country_id)
