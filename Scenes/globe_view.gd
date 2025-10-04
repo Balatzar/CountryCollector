@@ -9,9 +9,14 @@ extends Node2D
 ## Node references
 @onready var sub_viewport: SubViewport = $SubViewport
 @onready var world_scroller: Node2D = $SubViewport/WorldScroller
+@onready var clickable_world: Node2D = $SubViewport/WorldScroller/ClickableWorld1
 
 ## Internal state
-var tween: Tween = null
+var scroll_offset: float = 0.0
+var base_offset: Vector2 = Vector2.ZERO
+var world_copy: Node2D = null  # Visual copy for wrapping
+var visual_copies_created: bool = false
+
 func _apply_layout() -> void:
 	# Compute base offset so the scaled content stays centered in the square viewport
 	var vw: float = float(sub_viewport.size.x)
@@ -21,29 +26,54 @@ func _apply_layout() -> void:
 	base_offset = Vector2((vw - scaled_w) * 0.5, (vh - scaled_h) * 0.5)
 
 	world_scroller.scale = Vector2(world_scale, world_scale)
-	world_scroller.position = base_offset
-
-var base_offset: Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	_apply_layout()
-	_start_scrolling_animation()
+
+	# Create a visual copy container for wrapping
+	# Position it at map_width (before WorldScroller scaling is applied)
+	world_copy = Node2D.new()
+	world_scroller.add_child(world_copy)
+	world_copy.position = Vector2(map_width, 0)
+
+	# Wait a frame for ClickableWorld to populate, then create visual copies
+	await get_tree().process_frame
+	_create_visual_copies()
 
 
-func _start_scrolling_animation() -> void:
-	if tween:
-		tween.kill()
+func _create_visual_copies() -> void:
+	if visual_copies_created:
+		return
 
-	# Calculate animation duration based on speed (in screen space, independent of scale)
-	var effective_width: float = map_width * world_scale
-	var duration: float = effective_width / scroll_speed
+	# Create lightweight visual copies of all sprites (shares textures, no collision)
+	for child in clickable_world.get_children():
+		if child is Sprite2D:
+			var sprite_copy = Sprite2D.new()
+			sprite_copy.texture = child.texture
+			sprite_copy.centered = child.centered
+			sprite_copy.offset = child.offset
+			sprite_copy.position = child.position
+			sprite_copy.scale = child.scale
+			sprite_copy.rotation = child.rotation
+			sprite_copy.modulate = child.modulate
+			sprite_copy.z_index = child.z_index
+			# Don't copy collision shapes or Area2D - purely visual
+			world_copy.add_child(sprite_copy)
 
-	# Create infinite looping tween
-	tween = create_tween()
-	tween.set_loops()
-	tween.set_trans(Tween.TRANS_LINEAR)
+	visual_copies_created = true
+	print("Created ", world_copy.get_child_count(), " visual sprite copies at x=", world_copy.position.x)
 
-	# Animate from 0 to -map_width (one full map scroll)
-	# When it reaches -map_width, it loops back to 0, creating seamless scroll
-	tween.tween_property(world_scroller, "position:x", base_offset.x - map_width, duration).from(base_offset.x)
+
+func _process(delta: float) -> void:
+	# Update scroll offset
+	scroll_offset += scroll_speed * delta
+
+	# Wrap offset to stay within one map width
+	scroll_offset = fmod(scroll_offset, map_width)
+
+	# Position the world scroller
+	# The offset is in unscaled space, so we apply it directly to the scroller's position
+	# We keep the Y position constant at base_offset.y
+	world_scroller.position.x = base_offset.x - (scroll_offset * world_scroller.scale.x)
+	world_scroller.position.y = base_offset.y
