@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://fw6jtbbibwgd"]
 
-[ext_resource type="Script" path="res://Scenes/globe_view.gd" id="1"]
+[ext_resource type="Script" uid="uid://bnvqdug1qi1je" path="res://Scenes/globe_view.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://b0qrq8wpgyn7w" path="res://Scenes/ClickableWorld.tscn" id="2"]
 [ext_resource type="Shader" uid="uid://bh8ss517uitxx" path="res://Shaders/circular_mask.gdshader" id="3"]
 
@@ -36,12 +36,6 @@ color = Color(0.2, 0.4, 0.8, 1)
 [node name="WorldScroller" type="Node2D" parent="SubViewport"]
 
 [node name="ClickableWorld1" parent="SubViewport/WorldScroller" instance=ExtResource("2")]
-
-[node name="ClickableWorld2" parent="SubViewport/WorldScroller" instance=ExtResource("2")]
-position = Vector2(1800, 0)
-
-[node name="ClickableWorld3" parent="SubViewport/WorldScroller" instance=ExtResource("2")]
-position = Vector2(3600, 0)
 
 [node name="MaskDisplay" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_globe")
