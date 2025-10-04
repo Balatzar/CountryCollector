@@ -28,41 +28,43 @@ Web browser (HTML5 export), optimized for mouse/touch input
 
 - **ClickableWorld node** (`Scenes/clickable_world.gd`): The map rendering and hit detection system
   - Loads SVG world map files and extracts the viewBox for coordinate mapping
-  - Renders the SVG as a rasterized background using `Image.load_svg_from_string()`
-  - Parses SVG `<path>` elements to create collision polygons for hit detection
+  - Renders each country as an independent Sprite2D using `Image.load_svg_from_string()`
+  - Parses SVG `<path>` elements and creates individual SVG sprites per country
+  - Uses pixel-perfect collision detection via BitMap generated from sprite alpha channels
   - Emits `country_clicked(id: String)` signal when a dart hits a country
-  - Provides hover effects for visual feedback
 
 - **Game scene** (`Scenes/Game.tscn`): Root scene containing game logic, UI, and progression systems
 
 ### SVG Processing Pipeline
 
-1. **Viewbox extraction**: Reads SVG viewBox attribute to determine original coordinate space
-2. **Coordinate transformation**: Calculates scale and offset to fit the map to `fit_size` (default 1400x800)
-3. **Background rendering**: Rasterizes the entire SVG at calculated scale for visual display
-4. **Path parsing**: Custom SVG path parser (`_flatten_svg_path`) that supports:
-   - Movement: M/m
-   - Lines: L/l, H/h, V/v
-   - Bezier curves: C/c, S/s, Q/q, T/t
-   - Arcs: A/a (approximated as straight lines)
-   - Close path: Z/z
-5. **Collision generation**:
-   - Creates `Area2D` nodes with `CollisionPolygon2D` for each valid path
-   - Automatically simplifies polygons with >100 points using Ramer-Douglas-Peucker algorithm
-   - Validates polygons (minimum area, distinct points)
-   - Stores country ID in node metadata for click detection
+1. **Viewbox extraction**: Reads SVG `viewbox` attribute (lowercase) to determine original coordinate space
+2. **Coordinate transformation**: Calculates scale and offset to fit the map to `fit_size` (default 1800x1200)
+3. **Country identification**: Extracts all `<path>` elements and identifies countries by attribute priority:
+   - `name` attribute (highest priority)
+   - `class` attribute (medium priority)
+   - `id` attribute (fallback)
+4. **Individual SVG creation**: For each country path, creates a minimal SVG document containing only that path
+5. **Sprite rendering**: Rasterizes each country's SVG into a Sprite2D texture using Godot's SVG renderer
+6. **Collision generation**:
+   - Creates `BitMap` from sprite's alpha channel (threshold: 0.1)
+   - Converts bitmap to collision polygons using `opaque_to_polygons()` (epsilon: 2.0)
+   - Generates multiple `CollisionPolygon2D` nodes per country if needed
+   - Attaches `Area2D` to each sprite for click/hover detection
 
 ### Key Implementation Details
 
-- SVG coordinates are transformed to screen space: `world_pos = svg_pos * _scale + _offset`
-- Complex polygons are simplified to prevent collision system issues (tolerance: 2.0 pixels)
-- Hover effects are implemented via mouse_entered/mouse_exited signals on Area2D nodes
-- Bezier curves are sampled into line segments (adaptive step count based on distance)
-- The visible Polygon2D and collision Area2D are separate nodes to allow independent control
+- Each country is a separate `Sprite2D` node with its own texture, positioned at `_offset`
+- All sprites share the same viewbox, so they overlay correctly to form the complete map
+- Pixel-perfect collision avoids false positives from overlapping sprite rectangles
+- The SVG renderer handles all path complexity (curves, arcs, etc.) automatically
+- Country metadata is stored in Area2D's `country_id` meta property for event handling
 
 ## Working with Maps
 
 - Place SVG map files in `Assets/` directory
 - Assign the SVG file to the `svg_path` export variable in the Inspector for ClickableWorld nodes
-- SVG paths must have `id` attributes to identify clickable regions (e.g., `id="france"`)
-- The parser handles multi-part regions (e.g., island nations) by creating multiple Area2D nodes per ID
+- SVG paths should have identifying attributes to identify clickable regions:
+  - `name` attribute (preferred, e.g., `name="France"`)
+  - `class` attribute (alternative, e.g., `class="France"`)
+  - `id` attribute (fallback, e.g., `id="FR"`)
+- Multi-part countries (e.g., island nations) with multiple `<path>` elements sharing the same identifier will be rendered as separate sprites
