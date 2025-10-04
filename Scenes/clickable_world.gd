@@ -136,6 +136,7 @@ func _create_country_sprite(country_id: String, path_data: String, viewbox: Rect
 	sprite.texture = ImageTexture.create_from_image(image)
 	sprite.centered = false
 	sprite.position = _offset
+	sprite.set_meta("country_id", country_id)
 	add_child(sprite)
 
 	# Add Area2D for click detection using pixel-perfect collision
@@ -163,3 +164,11 @@ func _on_country_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			GameState.collect_country(country_id)
 			country_clicked.emit(country_id)
+			_fill_country_black(country_id)
+
+func _fill_country_black(country_id: String):
+	# Find all sprites with this country_id (handles multi-part countries)
+	for child in get_children():
+		if child is Sprite2D and child.has_meta("country_id") and child.get_meta("country_id") == country_id:
+			# Apply dark modulate to make it appear black
+			child.modulate = Color(0.2, 0.2, 0.2, 1.0)
