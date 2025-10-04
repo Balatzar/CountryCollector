@@ -31,12 +31,28 @@ Web browser (HTML5 export), optimized for mouse/touch input
 
 ### Core Components
 
+- **GameState singleton** (`GameState.gd`): Global autoload managing game state and events
+  - **Properties**:
+    - `all_countries: Array[String]` - List of all countries loaded from the map
+    - `collected_countries: Array[String]` - List of countries the player has collected
+  - **Signals**:
+    - `countries_loaded()` - Emitted when all countries from the map have been loaded
+    - `country_collected(country_id: String)` - Emitted when a player collects a country
+  - **Key methods**:
+    - `add_country(country_id)` - Adds a country to the all_countries list (called by ClickableWorld during map loading)
+    - `collect_country(country_id)` - Marks a country as collected and emits the signal
+    - `notify_countries_loaded()` - Emits the countries_loaded signal (called by ClickableWorld after parsing)
+    - `is_collected(country_id)` - Check if a country has been collected
+  - All game events flow through this singleton for centralized state management
+
 - **ClickableWorld node** (`Scenes/clickable_world.gd`): The map rendering and hit detection system
   - Loads SVG world map files and extracts the viewBox for coordinate mapping
   - Renders each country as an independent Sprite2D using `Image.load_svg_from_string()`
   - Parses SVG `<path>` elements and creates individual SVG sprites per country
   - Uses pixel-perfect collision detection via BitMap generated from sprite alpha channels
-  - Emits `country_clicked(id: String)` signal when a dart hits a country
+  - Registers each country with `GameState.add_country()` during sprite creation
+  - Calls `GameState.collect_country()` when a country is clicked
+  - Emits `country_clicked(id: String)` signal when a dart hits a country (legacy, prefer using GameState signals)
 
 - **Game scene** (`Scenes/Game.tscn`): Root scene containing game logic, UI, and progression systems
 
@@ -63,6 +79,20 @@ Web browser (HTML5 export), optimized for mouse/touch input
 - Pixel-perfect collision avoids false positives from overlapping sprite rectangles
 - The SVG renderer handles all path complexity (curves, arcs, etc.) automatically
 - Country metadata is stored in Area2D's `country_id` meta property for event handling
+
+### Signal Flow and State Management
+
+The game uses a centralized signal architecture through the GameState singleton:
+
+1. **Map Loading**: ClickableWorld parses SVG → calls `GameState.add_country()` for each country → emits `GameState.countries_loaded` when complete
+2. **Country Collection**: User clicks country → ClickableWorld calls `GameState.collect_country()` → emits `GameState.country_collected` signal
+3. **UI Updates**: UI components connect to GameState signals and react to state changes
+
+This pattern ensures:
+- Single source of truth for game state
+- Decoupled components that communicate through signals
+- Easy debugging with centralized state tracking
+- Consistent behavior across all game systems
 
 ## Working with Maps
 
