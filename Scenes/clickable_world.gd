@@ -164,6 +164,7 @@ func _on_country_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			GameState.collect_country(country_id)
 			country_clicked.emit(country_id)
+			print(country_id)
 			_fill_country_black(country_id)
 
 func _fill_country_black(country_id: String):
