@@ -10,6 +10,11 @@ CountryCollector is a 2D dart-throwing game where players throw darts at a world
 
 - **Run in editor**: Open project in Godot 4.5 and press F5
 - **Export for web**: Use Godot's export menu (Project > Export) with the HTML5/Web preset
+- **Lint GDScript files**: After creating or modifying `.gd` files, run linting to check for errors:
+  ```bash
+  /Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script path/to/file.gd
+  ```
+  Example: `/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/clickable_world.gd`
 
 ## Game Design
 
@@ -68,3 +73,10 @@ Web browser (HTML5 export), optimized for mouse/touch input
   - `class` attribute (alternative, e.g., `class="France"`)
   - `id` attribute (fallback, e.g., `id="FR"`)
 - Multi-part countries (e.g., island nations) with multiple `<path>` elements sharing the same identifier will be rendered as separate sprites
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+ALWAYS run `/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script <file.gd>` after creating or significantly modifying GDScript files to catch syntax errors and warnings.
