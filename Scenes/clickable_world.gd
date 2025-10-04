@@ -63,11 +63,14 @@ func _parse_and_render_countries():
 	var d_regex = RegEx.new()
 	d_regex.compile("d=\"([^\"]+)\"")
 
-	var id_regex = RegEx.new()
-	id_regex.compile("id=\"([^\"]+)\"")
+	var name_regex = RegEx.new()
+	name_regex.compile("name=\"([^\"]+)\"")
 
 	var class_regex = RegEx.new()
 	class_regex.compile("class=\"([^\"]+)\"")
+
+	var id_regex = RegEx.new()
+	id_regex.compile("id=\"([^\"]+)\"")
 
 	var path_matches = path_regex.search_all(_svg_content)
 	var viewbox = _extract_viewbox()
@@ -81,15 +84,19 @@ func _parse_and_render_countries():
 
 		var path_data = d_match.get_string(1)
 
-		# Try id first, then class
+		# Priority: name > class > id
 		var country_id = ""
-		var id_match = id_regex.search(path_element)
-		if id_match:
-			country_id = id_match.get_string(1)
+		var name_match = name_regex.search(path_element)
+		if name_match:
+			country_id = name_match.get_string(1)
 		else:
 			var class_match = class_regex.search(path_element)
 			if class_match:
 				country_id = class_match.get_string(1)
+			else:
+				var id_match = id_regex.search(path_element)
+				if id_match:
+					country_id = id_match.get_string(1)
 
 		if country_id != "":
 			_create_country_sprite(country_id, path_data, viewbox)
