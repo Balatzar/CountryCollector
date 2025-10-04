@@ -13,6 +13,11 @@ var _offset: Vector2 = Vector2.ZERO
 var _svg_content: String = ""
 
 func _ready():
+	# Remove display SVG when running the game
+	var display_sprite = get_node_or_null("Sprite2D")
+	if display_sprite:
+		display_sprite.queue_free()
+
 	if svg_path.is_empty():
 		push_error("No SVG path specified")
 		return
@@ -55,6 +60,12 @@ func _calculate_transform(viewbox: Rect2):
 	var scaled_size = svg_size * scale_factor
 	_offset = (fit_size - scaled_size) / 2.0
 	_offset -= Vector2(viewbox.position.x, viewbox.position.y) * scale_factor
+
+	# Print transform values for manual configuration
+	print("Display Sprite2D transform values:")
+	print("  - Centered: false")
+	print("  - Position: ", _offset)
+	print("  - Scale: ", _scale)
 
 func _parse_and_render_countries():
 	var path_regex = RegEx.new()
