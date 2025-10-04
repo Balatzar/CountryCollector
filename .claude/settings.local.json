@@ -4,7 +4,9 @@
       "Bash(godot:*)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script GameState.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/wold_and_ui.gd)",
-      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/clickable_world.gd)"
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/clickable_world.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/static_clickable_map.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/rotating_static_map.gd)"
     ],
     "deny": [],
     "ask": []
