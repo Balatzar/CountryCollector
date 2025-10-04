@@ -311,8 +311,7 @@ func _perpendicular_distance(point: Vector2, line_start: Vector2, line_end: Vect
 	return point.distance_to(projection)
 
 func _on_country_mouse_entered(country_id: String):
-	# Add hover effect if desired
-	pass
+	print(country_id)
 
 func _on_country_mouse_exited(country_id: String):
 	# Remove hover effect if desired
