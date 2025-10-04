@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://owijg867a052"
-path="res://.godot/imported/MEX_alpha.png-ce9babcff1f0c95185b6dc7fd55fb91e.ctex"
+path="res://.godot/imported/MEX_alpha.png-300715a86e91f7f77b8cdb9d9399a057.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/NA/MEX_alpha.png"
-dest_files=["res://.godot/imported/MEX_alpha.png-ce9babcff1f0c95185b6dc7fd55fb91e.ctex"]
+source_file="res://Assets/alphas/MEX_alpha.png"
+dest_files=["res://.godot/imported/MEX_alpha.png-300715a86e91f7f77b8cdb9d9399a057.ctex"]
 
 [params]
 

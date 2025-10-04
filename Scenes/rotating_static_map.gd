@@ -59,7 +59,6 @@ func _create_map_copy() -> void:
 			map_copy.add_child(sprite_copy)
 
 	copies_created = true
-	print("RotatingStaticMap: Created %d visual sprite copies" % map_copy.get_child_count())
 
 func _process(delta: float) -> void:
 	# Update scroll offset (in unscaled space)
@@ -73,3 +72,31 @@ func _process(delta: float) -> void:
 	var scaled_width = map_width * world_scroller.scale.x
 	var base_x = (1024 - scaled_width) / 2.0
 	world_scroller.position.x = base_x - (scroll_offset * world_scroller.scale.x)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			var vp := get_viewport()
+			var img: Image = vp.get_texture().get_image()  # CPU readback of the frame
+			if img.is_empty():
+					return
+
+			# If your window is stretched/scaled, map mouse -> texture size safely via UV
+			var mouse = event.position
+			var vp_size: Vector2 = vp.size
+			var tex_size: Vector2 = vp.get_texture().get_size()
+			var uv = mouse / vp_size
+			var px := Vector2i(uv * tex_size)
+
+			# Depending on backend, you may need to flip vertically:
+			# img.flip_y()
+			if px.x >= 0 and px.y >= 0 and px.x < img.get_width() and px.y < img.get_height():
+					var color: Color = img.get_pixelv(px)
+
+					# Use a higher tolerance to account for rendering differences
+					var country_id = GameState.get_country_by_color(color, 0.015)
+
+					if country_id != "":
+							print("Clicked country: ", country_id)
+							GameState.collect_country(country_id)
+					else:
+							print("No country found at color: ", color)

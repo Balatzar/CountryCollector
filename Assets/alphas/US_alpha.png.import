@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://coyyvb4e2gqfa"
-path="res://.godot/imported/CAN_alpha.png-e8f5b373ed01f9271802c9817c6263b0.ctex"
+uid="uid://dkjrky06d4t3f"
+path="res://.godot/imported/US_alpha.png-e2c971b34f8e1408c0447c9f46fde43f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/NA/CAN_alpha.png"
-dest_files=["res://.godot/imported/CAN_alpha.png-e8f5b373ed01f9271802c9817c6263b0.ctex"]
+source_file="res://Assets/alphas/US_alpha.png"
+dest_files=["res://.godot/imported/US_alpha.png-e2c971b34f8e1408c0447c9f46fde43f.ctex"]
 
 [params]
 
