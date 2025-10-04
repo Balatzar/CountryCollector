@@ -19,6 +19,11 @@ extends Node2D
 @export var trajectory_resolution: int = 30  ## Number of points in the curve (smoothness)
 @export var min_arch_factor: float = 0.05  ## Arch amount for downward throws (taut)
 @export var max_arch_factor: float = 0.35  ## Arch amount for upward throws (arched)
+# Asymmetric handle tuning (cubic Bézier)
+@export var start_handle_strength: float = 1.0   ## Multiplier for start handle length (relative to base arch)
+@export var end_handle_strength: float = 0.35    ## Multiplier for end handle length (weaker for perspective)
+@export var start_forward_bias: float = 0.10     ## Small along-trajectory bias at the start (0..0.5)
+@export var end_backward_bias: float = 0.05      ## Small backward bias on the end handle (0..0.5)
 # Per-sprite tip offsets in local coordinates relative to each Sprite2D
 @export var tip_offset_left: Vector2 = Vector2(0, -300)
 @export var tip_offset_center: Vector2 = Vector2(0, -300)
@@ -149,48 +154,54 @@ func _get_dart_tip_position() -> Vector2:
 
 
 func _generate_bezier_curve(start: Vector2, end: Vector2, resolution: int) -> PackedVector2Array:
-	## Generates a quadratic Bézier curve from start to end with dynamic control point
-	## The control point is calculated based on the vertical direction to create
-	## taut curves for downward throws and arched curves for upward throws
+	## Generates a cubic Bézier curve with asymmetric handles for perspective
+	## Stronger handle near the start, weaker near the end.
 
 	var points: PackedVector2Array = PackedVector2Array()
 
-	# Calculate direction and distance
-	var direction: Vector2 = (end - start).normalized()
-	var distance: float = start.distance_to(end)
+	# Direction and distance
+	var direction: Vector2 = (end - start)
+	var distance: float = max(0.001, direction.length())
+	var dir: Vector2 = direction / distance
 
-	# Vertical factor: positive when aiming upward, negative when aiming downward
-	# In Godot, negative Y is up, so we negate direction.y
-	var vertical_factor: float = -direction.y
-
-	# Map vertical factor to arch amount
-	# Upward throws (vertical_factor > 0) get more arch
-	# Downward throws (vertical_factor < 0) get less arch (taut)
+	# Vertical factor: positive when aiming upward (screen -Y)
+	var vertical_factor: float = -dir.y
 	var normalized_factor: float = clamp(vertical_factor, -1.0, 1.0)
 	var arch_amount: float = lerp(min_arch_factor, max_arch_factor, (normalized_factor + 1.0) / 2.0)
 
-	# Calculate control point: ahead along the shot, offset upward by a normal
-	var midpoint: Vector2 = start.lerp(end, 0.5)
-	var normal: Vector2 = Vector2(-direction.y, direction.x)  # 90deg CCW
-	# Ensure the normal points upward on screen (negative Y). Flip if not.
-	if normal.y > 0.0:
-		normal = -normal
-	var control_point: Vector2 = midpoint + normal * distance * arch_amount
+	# Upward-pointing normal (flip if needed)
+	var n: Vector2 = Vector2(-dir.y, dir.x)
+	if n.y > 0.0:
+		n = -n
 
-	# Generate curve points using quadratic Bézier formula
-	# B(t) = (1-t)²P₀ + 2(1-t)tP₁ + t²P₂
+	# Handle lengths (asymmetric)
+	var base_len: float = distance * arch_amount
+	var len_start: float = base_len * max(0.0, start_handle_strength)
+	var len_end: float = base_len * max(0.0, end_handle_strength)
+
+	# Small forward/backward bias scaled by arch so downward shots remain taut
+	var f_start: float = distance * start_forward_bias * arch_amount
+	var f_end: float = distance * end_backward_bias * arch_amount
+
+	# Cubic control points
+	var p0: Vector2 = start
+	var p3: Vector2 = end
+	var p1: Vector2 = p0 + n * len_start + dir * f_start
+	var p2: Vector2 = p3 - dir * f_end - n * len_end
+
+	# Sample cubic Bézier
 	for i in range(resolution + 1):
 		var t: float = float(i) / float(resolution)
-		var one_minus_t: float = 1.0 - t
-
+		var omt: float = 1.0 - t
+		var omt2: float = omt * omt
+		var t2: float = t * t
 		var point: Vector2 = (
-			one_minus_t * one_minus_t * start +
-			2.0 * one_minus_t * t * control_point +
-			t * t * end
+			omt2 * omt * p0 +
+			3.0 * omt2 * t * p1 +
+			3.0 * omt * t2 * p2 +
+			t2 * t * p3
 		)
-
 		points.append(point)
-
 	return points
 
 
