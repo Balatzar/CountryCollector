@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://cr7n2oqojw87i"]
+
+[ext_resource type="Script" uid="uid://xblq52d7xabp" path="res://Scenes/dart.gd" id="1_3y8qm"]
+[ext_resource type="Texture2D" uid="uid://c4ygfo2vai2r7" path="res://Assets/dart_left_up.png" id="2_left"]
+[ext_resource type="Texture2D" uid="uid://bvfie05j4p0ti" path="res://Assets/dart_right_up.png" id="3_right"]
+[ext_resource type="Texture2D" uid="uid://d3374doce0182" path="res://Assets/darte_center_up.png" id="4_center"]
+
+[node name="Dart" type="Node2D"]
+script = ExtResource("1_3y8qm")
+
+[node name="SpriteLeft" type="Sprite2D" parent="."]
+position = Vector2(-12, -299)
+texture = ExtResource("2_left")
+centered = false
+offset = Vector2(-645, 0)
+
+[node name="SpriteRight" type="Sprite2D" parent="."]
+position = Vector2(11, -289)
+texture = ExtResource("3_right")
+centered = false
+offset = Vector2(-2, 0)
+
+[node name="SpriteCenter" type="Sprite2D" parent="."]
+position = Vector2(-322, -295)
+texture = ExtResource("4_center")
+centered = false
