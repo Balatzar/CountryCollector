@@ -4,6 +4,7 @@ extends Node
 signal countries_loaded()
 signal country_collected(country_id: String)
 signal dart_thrown()
+signal dart_landed()
 signal darts_changed(remaining_darts: int)
 signal loading_started(total: int)
 signal country_loading_progress(loaded: int, total: int)
@@ -16,6 +17,9 @@ var collected_countries: Array[String] = []
 
 # Dictionary mapping country_id to their assigned color
 var country_colors: Dictionary = {}
+
+# Pending country from click (will be collected when dart lands)
+var pending_country: String = ""
 
 # Dart tracking
 const MAX_DARTS: int = 10
@@ -102,6 +106,16 @@ func finish_loading() -> void:
 	countries_loaded_count = 0
 	countries_total_count = 0
 	countries_loaded.emit()
+
+
+# Set the pending country that was clicked
+func set_pending_country(country_id: String) -> void:
+	pending_country = country_id
+
+
+# Signal that the dart has landed
+func land_dart() -> void:
+	dart_landed.emit()
 
 
 # Check if a country has been collected

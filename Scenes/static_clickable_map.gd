@@ -26,8 +26,13 @@ const COUNTRIES = [
 	"UZ", "VC", "VE", "VN", "VU", "YE", "ZA", "ZM", "ZW"
 ]
 
+# Dictionary to store sprite references by country_id
+var country_sprites: Dictionary = {}
+
 func _ready():
 	_load_countries()
+	# Connect to country collection signal
+	GameState.country_collected.connect(_on_country_collected)
 
 func _load_countries():
 	print("[StaticMap] Loading countries from: ", ASSETS_DIR)
@@ -92,18 +97,25 @@ func _create_country_sprite(country_id: String):
 		push_error("Failed to load alpha texture: " + alpha_path)
 		return
 
-	# Generate a random bright color for each country
-	var random_color = Color(randf(), randf(), randf(), 1.0)
+	# Check if country is already collected
+	var is_collected = GameState.is_collected(country_id)
+
+	# Use white for collected countries, random color otherwise
+	var color_to_use: Color
+	if is_collected:
+		color_to_use = Color.WHITE
+	else:
+		color_to_use = Color(randf(), randf(), randf(), 1.0)
 
 	# Create a colored texture from the alpha mask
 	var alpha_image = alpha_texture.get_image()
 	var colored_image = Image.create(alpha_image.get_width(), alpha_image.get_height(), false, Image.FORMAT_RGBA8)
 
-	# Fill the image with the random color, using the alpha mask
+	# Fill the image with the chosen color, using the alpha mask
 	for y in range(alpha_image.get_height()):
 		for x in range(alpha_image.get_width()):
 			var alpha_value = alpha_image.get_pixel(x, y).a
-			colored_image.set_pixel(x, y, Color(random_color.r, random_color.g, random_color.b, alpha_value))
+			colored_image.set_pixel(x, y, Color(color_to_use.r, color_to_use.g, color_to_use.b, alpha_value))
 
 	var colored_texture = ImageTexture.create_from_image(colored_image)
 
@@ -113,6 +125,33 @@ func _create_country_sprite(country_id: String):
 	sprite.position = Vector2.ZERO
 	add_child(sprite)
 
-	# Register color in GameState
+	# Store sprite reference
+	country_sprites[country_id] = sprite
+
+	# Register color in GameState (only if not collected, white countries don't need color tracking)
 	GameState.add_country(country_id)
-	GameState.register_country_color(country_id, random_color)
+	if not is_collected:
+		GameState.register_country_color(country_id, color_to_use)
+
+func _on_country_collected(country_id: String):
+	# Update the sprite color to white when collected
+	if country_id not in country_sprites:
+		return
+
+	var sprite = country_sprites[country_id]
+	var alpha_path = ASSETS_DIR + country_id + ".png"
+	var alpha_texture = load(alpha_path)
+
+	if alpha_texture == null:
+		return
+
+	# Regenerate texture with white color
+	var alpha_image = alpha_texture.get_image()
+	var white_image = Image.create(alpha_image.get_width(), alpha_image.get_height(), false, Image.FORMAT_RGBA8)
+
+	for y in range(alpha_image.get_height()):
+		for x in range(alpha_image.get_width()):
+			var alpha_value = alpha_image.get_pixel(x, y).a
+			white_image.set_pixel(x, y, Color(1.0, 1.0, 1.0, alpha_value))
+
+	sprite.texture = ImageTexture.create_from_image(white_image)

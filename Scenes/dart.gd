@@ -277,6 +277,8 @@ func _start_throw_to(mouse_pos: Vector2) -> void:
 		var shot_end_time: float = Time.get_ticks_msec() / 1000.0
 		var shot_duration: float = shot_end_time - shot_start_time
 		print("Shot duration: %.3f seconds" % shot_duration)
+		# Signal that the dart has landed
+		GameState.land_dart()
 	)
 
 func _update_projectile_along_bezier(t: float, proj: Node2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> void:
