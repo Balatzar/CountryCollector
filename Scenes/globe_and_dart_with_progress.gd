@@ -31,7 +31,7 @@ func _on_countries_loaded() -> void:
 	await get_tree().process_frame
 
 	# Start the rotating map (this will copy sprites and begin rotation)
-	var rotating_map = globe_with_dart.get_node("RotatingStaticMap")
+	var rotating_map = globe_with_dart.get_node("ZoomController/RotatingStaticMap")
 	if rotating_map and rotating_map.has_method("start_rotation"):
 		rotating_map.start_rotation()
 

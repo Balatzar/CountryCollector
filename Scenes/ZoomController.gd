@@ -40,8 +40,18 @@ func _ready() -> void:
 	base_position = globe_display.position
 	print("[ZoomController] Base scale: ", base_scale, " Base position: ", base_position)
 
+	# Connect to GameState signals
+	GameState.zoom_bonus_acquired.connect(_on_zoom_bonus_acquired)
+
+	# Initialize zoom level from GameState
+	current_zoom_level = GameState.current_zoom_level
+
 
 func _input(event: InputEvent) -> void:
+	# Only handle zoom if we have a zoom bonus
+	if current_zoom_level == 0:
+		return
+
 	# Handle spacebar press/release for zoom
 	if event is InputEventKey:
 		if event.keycode == KEY_SPACE:
@@ -139,4 +149,16 @@ func _zoom_out() -> void:
 	zoom_tween.tween_property(globe_display, "position", base_position, zoom_duration)
 
 	print("[ZoomController] Zooming out to normal view")
+
+
+func _on_zoom_bonus_acquired(zoom_level: int) -> void:
+	"""Handle zoom bonus acquisition from GameState"""
+	if zoom_level == 0:
+		# Zoom was cancelled out, zoom out if currently zoomed
+		current_zoom_level = 0
+		if is_zoomed:
+			_zoom_out()
+		print("[ZoomController] Zoom disabled (cancelled by unzoom)")
+	else:
+		set_zoom_level(zoom_level)
 

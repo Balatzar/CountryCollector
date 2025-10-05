@@ -21,7 +21,8 @@
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/xb_bar.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/Card.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/debug_panel.gd)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/globe_and_dart_with_progress.gd)"
     ],
     "deny": [],
     "ask": []

@@ -103,6 +103,27 @@ theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
 layout_mode = 2
 theme_override_constants/separation = 8
 
+[node name="ZoomHelpPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/LeftPanel"]
+visible = false
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ZoomHelpVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/ZoomHelpPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ZoomHelpLabel" type="Label" parent="MarginContainer/LayoutContainer/LeftPanel/ZoomHelpPanel/ZoomHelpVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "🔍 ZOOM UNLOCKED
+
+Hold SPACEBAR to zoom"
+horizontal_alignment = 1
+
 [node name="CenterAndRightContainer" type="VBoxContainer" parent="MarginContainer/LayoutContainer"]
 layout_mode = 2
 size_flags_horizontal = 3

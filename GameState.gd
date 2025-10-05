@@ -18,6 +18,7 @@ signal xp_changed(current_xp: int, level: int)
 signal level_up(new_level: int)
 signal rotation_speed_changed(multiplier: float)
 signal globe_scale_changed(multiplier: float)
+signal zoom_bonus_acquired(zoom_level: int)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -40,6 +41,11 @@ var remaining_darts: int = MAX_DARTS
 
 # Card/bonus tracking
 var acquired_cards: Array[Dictionary] = []
+
+# Zoom tracking
+var current_zoom_level: int = 0  # Net zoom level: positive = zoom bonus, negative = unzoom malus, 0 = neutral
+var zoom_bonus_tier: int = 0  # Track highest zoom bonus tier acquired (0-3)
+var unzoom_malus_tier: int = 0  # Track highest unzoom malus tier acquired (0-3)
 
 # Loading state
 var loading_in_progress: bool = false
@@ -225,7 +231,34 @@ func acquire_card(card_data: Dictionary) -> void:
 		rotation_speed_changed.emit(new_multiplier)
 		print("[GameState] Rotation speed multiplier updated: ", new_multiplier)
 	elif card_id.begins_with("unzoom_"):
+		# Update unzoom malus tier
+		if card_id == "unzoom_t1":
+			unzoom_malus_tier = 1
+		elif card_id == "unzoom_t2":
+			unzoom_malus_tier = 2
+		elif card_id == "unzoom_t3":
+			unzoom_malus_tier = 3
+
+		# Recalculate net zoom level (zoom bonus - unzoom malus)
+		_update_net_zoom_level()
+
 		# Update globe scale when unzoom maluses are acquired
+		var new_multiplier = get_globe_scale_multiplier()
+		globe_scale_changed.emit(new_multiplier)
+		print("[GameState] Globe scale multiplier updated: ", new_multiplier)
+	elif card_id.begins_with("zoom_"):
+		# Update zoom bonus tier
+		if card_id == "zoom_t1":
+			zoom_bonus_tier = 1
+		elif card_id == "zoom_t2":
+			zoom_bonus_tier = 2
+		elif card_id == "zoom_t3":
+			zoom_bonus_tier = 3
+
+		# Recalculate net zoom level (zoom bonus - unzoom malus)
+		_update_net_zoom_level()
+
+		# Also update globe scale since zoom can cancel out unzoom's effect
 		var new_multiplier = get_globe_scale_multiplier()
 		globe_scale_changed.emit(new_multiplier)
 		print("[GameState] Globe scale multiplier updated: ", new_multiplier)
@@ -271,15 +304,41 @@ func get_rotation_speed_multiplier() -> float:
 func get_globe_scale_multiplier() -> float:
 	var multiplier := 1.0
 
-	# Check for unzoom maluses (make globe smaller)
-	if has_card("Unzoom III"):
-		multiplier *= 0.5  # 50% reduction
-	elif has_card("Unzoom II"):
-		multiplier *= 0.7  # 30% reduction
-	elif has_card("Unzoom I"):
-		multiplier *= 0.85  # 15% reduction
+	# Only apply unzoom if it exceeds zoom bonus (net negative zoom)
+	# This ensures zoom and unzoom cancel each other out
+	var excess_unzoom = unzoom_malus_tier - zoom_bonus_tier
+
+	if excess_unzoom > 0:
+		# Apply unzoom scaling based on the excess tiers
+		if excess_unzoom >= 3:
+			multiplier *= 0.5  # 50% reduction (equivalent to Unzoom III)
+		elif excess_unzoom == 2:
+			multiplier *= 0.7  # 30% reduction (equivalent to Unzoom II)
+		elif excess_unzoom == 1:
+			multiplier *= 0.85  # 15% reduction (equivalent to Unzoom I)
 
 	return multiplier
+
+
+# Update the net zoom level based on zoom bonus and unzoom malus tiers
+func _update_net_zoom_level() -> void:
+	var old_zoom_level = current_zoom_level
+
+	# Calculate net zoom: zoom bonus tier - unzoom malus tier
+	# Result can be -3 to +3
+	var net_level = zoom_bonus_tier - unzoom_malus_tier
+
+	# Clamp to valid zoom controller range (0-3)
+	# If net is negative or zero, no zoom ability
+	# If net is positive, that's the zoom level
+	current_zoom_level = max(0, net_level)
+
+	print("[GameState] Zoom calculation: bonus_tier=", zoom_bonus_tier, " - unzoom_tier=", unzoom_malus_tier, " = net=", net_level, " -> zoom_level=", current_zoom_level)
+
+	# Emit signal if zoom level changed
+	if current_zoom_level != old_zoom_level:
+		zoom_bonus_acquired.emit(current_zoom_level)
+		print("[GameState] Zoom level updated to: ", current_zoom_level)
 
 
 # Generate random card choices for the store

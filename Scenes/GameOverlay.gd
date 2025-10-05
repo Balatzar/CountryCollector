@@ -9,6 +9,7 @@ extends CanvasLayer
 @onready var bonus_container: VBoxContainer = $MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox/BonusEffectsList
 @onready var malus_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/MalusPanel
 @onready var malus_container: VBoxContainer = $MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox/MalusEffectsList
+@onready var zoom_help_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/ZoomHelpPanel
 
 # Dart icon references for updating
 var dart_icons: Array[TextureRect] = []
@@ -25,6 +26,7 @@ func _ready() -> void:
 	GameState.country_collected.connect(_on_country_collected)
 	GameState.darts_changed.connect(_on_darts_changed)
 	GameState.card_acquired.connect(_on_card_acquired)
+	GameState.zoom_bonus_acquired.connect(_on_zoom_bonus_acquired)
 
 	# Initialize countries list with any already collected countries
 	for country_id in GameState.collected_countries:
@@ -180,3 +182,9 @@ func _clear_container(container: VBoxContainer) -> void:
 	"""Clear all children from a container"""
 	for child in container.get_children():
 		child.queue_free()
+
+
+func _on_zoom_bonus_acquired(zoom_level: int) -> void:
+	"""Show/hide the zoom help panel based on zoom level"""
+	# Show help panel only if zoom is active (level > 0)
+	zoom_help_panel.visible = (zoom_level > 0)
