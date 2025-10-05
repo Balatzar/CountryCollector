@@ -11,7 +11,9 @@ config_version=5
 [application]
 
 config/name="CountryCollector"
+run/main_scene="uid://bolaoptqar2l"
 config/features=PackedStringArray("4.5", "GL Compatibility")
+run/max_fps=120
 config/icon="res://icon.svg"
 
 [autoload]
@@ -22,6 +24,11 @@ GameState="*res://GameState.gd"
 
 window/size/viewport_width=1800
 window/size/viewport_height=1200
+window/vsync/vsync_mode=0
+
+[editor]
+
+movie_writer/fps=120
 
 [rendering]
 

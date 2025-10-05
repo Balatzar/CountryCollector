@@ -4,30 +4,73 @@ const ASSETS_DIR = "res://Assets/alphas/"
 const IMAGE_WIDTH = 1024
 const IMAGE_HEIGHT = 512
 
+# List of countries - hardcoded because DirAccess doesn't work in HTML5 exports
+const COUNTRIES = [
+	"AE", "AF", "AL", "AM", "AO", "AR", "AT", "AU", "AZ", "BA",
+	"BD", "BE", "BF", "BG", "BI", "BJ", "BN", "BO", "BR", "BS",
+	"BT", "BW", "BY", "BZ", "CA", "CD", "CF", "CG", "CH", "CI",
+	"CL", "CM", "CN", "CO", "CR", "CU", "CV", "CY", "CZ", "DE",
+	"DJ", "DK", "DM", "DO", "DZ", "EC", "EE", "EG", "ER", "ES",
+	"ET", "FI", "FK", "FR", "GA", "GB", "GE", "GH", "GL", "GM",
+	"GN", "GQ", "GR", "GT", "GW", "GY", "HN", "HR", "HT", "HU",
+	"ID", "IE", "IL", "IN", "IQ", "IR", "IS", "IT", "JM", "JO",
+	"JP", "KE", "KG", "KH", "KM", "KP", "KR", "KW", "KZ", "LA",
+	"LB", "LC", "LK", "LR", "LS", "LT", "LU", "LV", "LY", "MA",
+	"MD", "ME", "MG", "MK", "ML", "MM", "MN", "MR", "MT", "MU",
+	"MV", "MW", "MX", "MY", "MZ", "NA", "NC", "NE", "NG", "NI",
+	"NL", "NO", "NP", "NZ", "OM", "PA", "PE", "PG", "PH", "PK",
+	"PL", "PR", "PT", "PY", "QA", "RO", "RS", "RU", "RW", "SA",
+	"SB", "SC", "SD", "SE", "SG", "SI", "SK", "SL", "SN", "SO",
+	"SR", "SS", "ST", "SV", "SY", "SZ", "TD", "TG", "TH", "TJ",
+	"TM", "TN", "TR", "TT", "TW", "TZ", "UA", "UG", "US", "UY",
+	"UZ", "VC", "VE", "VN", "VU", "YE", "ZA", "ZM", "ZW"
+]
+
 func _ready():
 	_load_countries()
 
 func _load_countries():
+	print("[StaticMap] Loading countries from: ", ASSETS_DIR)
+
+	# Try directory listing first (works in editor/native builds)
 	var dir = DirAccess.open(ASSETS_DIR)
-	if dir == null:
-		push_error("Failed to open directory: " + ASSETS_DIR)
-		return
+	var country_list = []
 
-	var alpha_files = []
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	while file_name != "":
-		if file_name.ends_with("_alpha.png"):
-			alpha_files.append(file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
+	if dir != null:
+		var alpha_files = []
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			# Only include .png files, skip .import files
+			if file_name.ends_with(".png") and not file_name.ends_with(".import"):
+				alpha_files.append(file_name)
+			file_name = dir.get_next()
+		dir.list_dir_end()
 
-	for alpha_file in alpha_files:
-		var country_id = alpha_file.replace("_alpha.png", "")
+		if alpha_files.size() > 0:
+			# Directory listing worked (editor/native)
+			for alpha_file in alpha_files:
+				country_list.append(alpha_file.replace(".png", ""))
+		else:
+			# Directory listing failed (HTML5), use hardcoded list
+			print("[StaticMap] Directory listing failed, using hardcoded country list")
+			country_list = COUNTRIES
+	else:
+		# Directory access failed, use hardcoded list
+		print("[StaticMap] Directory access failed, using hardcoded country list")
+		country_list = COUNTRIES
+
+	print("[StaticMap] Found ", country_list.size(), " countries")
+
+	for country_id in country_list:
 		_create_country_sprite(country_id)
 
+	print("[StaticMap] Created ", get_child_count(), " sprites")
+	# Notify that all countries have been loaded
+	GameState.notify_countries_loaded()
+
 func _create_country_sprite(country_id: String):
-	var alpha_path = ASSETS_DIR + country_id + "_alpha.png"
+	var alpha_path = ASSETS_DIR + country_id + ".png"
 	var alpha_texture = load(alpha_path)
 
 	if alpha_texture == null:
