@@ -7,20 +7,51 @@
 
 [node name="Dart" type="Node2D"]
 script = ExtResource("1_3y8qm")
+max_skew = 0.0
+max_rotation_degrees = 10.0
+perspective_damping = 0.5
+bottom_offset = 10.0
+damping = 0.05
+trajectory_width = 5.0
+min_arch_factor = 1.0
+max_arch_factor = 1.5
+start_handle_strength = 0.0
+end_handle_strength = 0.7
+start_forward_bias = 0.0
+end_backward_bias = -0.5
+projectile_rotation_factor = 1.0
 
 [node name="SpriteLeft" type="Sprite2D" parent="."]
 position = Vector2(-12, -299)
+rotation = -0.62133723
 texture = ExtResource("2_left")
 centered = false
 offset = Vector2(-645, 0)
 
+[node name="TipAnchor" type="Node2D" parent="SpriteLeft"]
+
 [node name="SpriteRight" type="Sprite2D" parent="."]
 position = Vector2(11, -289)
+rotation = 0.64053583
 texture = ExtResource("3_right")
 centered = false
 offset = Vector2(-2, 0)
 
+[node name="TipAnchor" type="Node2D" parent="SpriteRight"]
+
 [node name="SpriteCenter" type="Sprite2D" parent="."]
 position = Vector2(-322, -295)
+scale = Vector2(1, 1.2843823)
 texture = ExtResource("4_center")
 centered = false
+
+[node name="TipAnchor" type="Node2D" parent="SpriteCenter"]
+position = Vector2(322, 4.671505)
+
+[node name="TrajectoryLine" type="Line2D" parent="."]
+width = 3.0
+default_color = Color(1, 1, 1, 0.6)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+antialiased = true

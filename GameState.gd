@@ -15,7 +15,23 @@ var country_colors: Dictionary = {}
 
 
 func _ready() -> void:
-	pass
+	_apply_custom_cursor()
+
+func _apply_custom_cursor() -> void:
+	# Prefer cursor.png, fallback to pointer.png if not present
+	var candidates := [
+		"res://Assets/cursor.png",
+		"res://Assets/pointer.png",
+	]
+	for p in candidates:
+		if ResourceLoader.exists(p):
+			var tex: Texture2D = load(p)
+			if tex:
+				# Center the hotspot by default
+				var sz = tex.get_size()
+				var hotspot := Vector2i(int(sz.x * 0.5), int(sz.y * 0.5))
+				Input.set_custom_mouse_cursor(tex, Input.CURSOR_ARROW, hotspot)
+				break
 
 
 # Add a country to the list of all countries
