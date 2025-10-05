@@ -2,6 +2,9 @@ extends MarginContainer
 
 ## XP Bar component with animations and visual effects
 
+# Signals
+signal level_up_animation_complete()
+
 # Node references
 @onready var xp_progress_bar: ProgressBar = $XPPanel/XPHBox/XPProgressBar
 @onready var xp_panel: PanelContainer = $XPPanel
@@ -114,11 +117,14 @@ func animate_xp_level_up() -> void:
 	bounce_tween.tween_property(xp_panel, "scale", Vector2(1.05, 1.05), 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 	bounce_tween.tween_property(xp_panel, "scale", Vector2.ONE, 0.3).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_ELASTIC)
 
-	# Glow pulse
+	# Glow pulse (this is the longest animation)
 	var glow_tween := create_tween()
 	for i in range(3):
 		glow_tween.tween_property(xp_progress_bar, "modulate", Color(1.3, 1.2, 1.0, 1.0), 0.2)
 		glow_tween.tween_property(xp_progress_bar, "modulate", Color.WHITE, 0.2)
+
+	# Emit signal when all animations complete
+	glow_tween.finished.connect(func(): level_up_animation_complete.emit())
 
 
 func _on_xp_panel_resized() -> void:
