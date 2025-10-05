@@ -17,7 +17,8 @@
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GameOverlay.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/notification_display.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/test_notification.gd)",
-      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/Game.gd)"
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/Game.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/xb_bar.gd)"
     ],
     "deny": [],
     "ask": []

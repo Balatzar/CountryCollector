@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://store_overlay_001"]
+[gd_scene load_steps=2 format=3 uid="uid://bqbfxmpk5o6md"]
 
-[ext_resource type="Script" path="res://Scenes/StoreOverlay.gd" id="1_store_script"]
+[ext_resource type="Script" uid="uid://c1b42er8wcrry" path="res://Scenes/StoreOverlay.gd" id="1_store_script"]
 
 [node name="StoreOverlay" type="CanvasLayer"]
 script = ExtResource("1_store_script")
@@ -26,4 +26,3 @@ mouse_filter = 2
 layout_mode = 2
 theme_override_constants/separation = 40
 alignment = 1
-
