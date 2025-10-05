@@ -10,7 +10,11 @@
       "Bash(grep:*)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/dart.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/CountryProgressBar.gd)",
-      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GlobeAndDartWithProgress.gd)"
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GlobeAndDartWithProgress.gd)",
+      "WebSearch",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script CountryNames.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/OverlayUI.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GameOverlay.gd)"
     ],
     "deny": [],
     "ask": []

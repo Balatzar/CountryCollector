@@ -15,6 +15,8 @@ extends Control
 @onready var timer_label: Label = $VBoxContainer/TimerLabel
 @onready var countdown_timer: Timer = $CountdownTimer
 
+# Reference to CountryNames for displaying full country names
+const CountryNames = preload("res://CountryNames.gd")
 
 # -- FONCTION D'INITIALISATION --
 # Cette fonction est appelée une seule fois lorsque le nœud entre dans la scène.
@@ -23,9 +25,12 @@ func _ready():
 	update_darts_display()
 	update_countries_display()
 	update_timer_display()
-	
+
 	# On connecte le signal 'timeout' du Timer à notre fonction de mise à jour.
 	countdown_timer.timeout.connect(_on_countdown_timer_timeout)
+
+	# Connect to GameState signals to display country names when collected
+	GameState.country_collected.connect(_on_country_collected)
 
 
 # -- FONCTIONS DE MISE À JOUR DE L'AFFICHAGE --
@@ -49,10 +54,10 @@ func update_timer_display():
 func _on_countdown_timer_timeout():
 	# On décrémente le temps.
 	countdown_time -= 1
-	
+
 	# On met à jour l'affichage.
 	update_timer_display()
-	
+
 	# Si le temps est écoulé...
 	if countdown_time <= 0:
 		# On arrête le timer pour qu'il ne devienne pas négatif.
@@ -60,3 +65,10 @@ func _on_countdown_timer_timeout():
 		print("Le temps est écoulé !")
 		# Ici, vous pourriez ajouter la logique de fin de partie.
 		# Par exemple : get_tree().change_scene_to_file("res://game_over_screen.tscn")
+
+# -- GESTION DES PAYS COLLECTÉS --
+
+# Called when a country is collected to display its full name
+func _on_country_collected(country_id: String):
+	var country_name = CountryNames.get_country_name(country_id)
+	print("Pays collecté : %s (%s)" % [country_name, country_id])

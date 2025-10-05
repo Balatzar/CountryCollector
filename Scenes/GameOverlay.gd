@@ -13,6 +13,9 @@ extends CanvasLayer
 # Dart icon references for updating
 var dart_icons: Array[TextureRect] = []
 
+# Reference to CountryNames for displaying full country names
+const CountryNames = preload("res://CountryNames.gd")
+
 
 func _ready() -> void:
 	# Setup dart counter
@@ -82,7 +85,8 @@ func _on_darts_changed(remaining_darts: int) -> void:
 
 func _add_country_to_list(country_id: String) -> void:
 	var country_label := Label.new()
-	country_label.text = "✓ " + country_id
+	var country_name := CountryNames.get_country_name(country_id)
+	country_label.text = "✓ " + country_name
 	country_label.add_theme_font_size_override("font_size", 20)
 	country_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))  # Bright green
 	country_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
