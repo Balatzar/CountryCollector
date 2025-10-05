@@ -19,12 +19,14 @@ CountryCollector is a 2D dart-throwing game where players throw darts at a world
 ## Game Design
 
 ### Core Mechanics
+
 - **Dart throwing**: Players aim and throw darts at a world map
 - **Country collection**: Successfully hitting a country adds it to the player's collection
 - **Progression system**: Players earn levels as they collect countries
 - **Abilities**: Unlock special abilities that help complete the collection (e.g., better aim, larger hit radius, hints)
 
 ### Target Platform
+
 Web browser (HTML5 export), optimized for mouse/touch input
 
 ## Project Architecture
@@ -32,6 +34,7 @@ Web browser (HTML5 export), optimized for mouse/touch input
 ### Core Components
 
 - **GameState singleton** (`GameState.gd`): Global autoload managing game state and events
+
   - **Properties**:
     - `all_countries: Array[String]` - List of all countries loaded from the map
     - `collected_countries: Array[String]` - List of countries the player has collected
@@ -41,11 +44,11 @@ Web browser (HTML5 export), optimized for mouse/touch input
   - **Key methods**:
     - `add_country(country_id)` - Adds a country to the all_countries list (called by ClickableWorld during map loading)
     - `collect_country(country_id)` - Marks a country as collected and emits the signal
-    - `notify_countries_loaded()` - Emits the countries_loaded signal (called by ClickableWorld after parsing)
     - `is_collected(country_id)` - Check if a country has been collected
   - All game events flow through this singleton for centralized state management
 
 - **ClickableWorld node** (`Scenes/clickable_world.gd`): The map rendering and hit detection system
+
   - Loads SVG world map files and extracts the viewBox for coordinate mapping
   - Renders each country as an independent Sprite2D using `Image.load_svg_from_string()`
   - Parses SVG `<path>` elements and creates individual SVG sprites per country
@@ -89,6 +92,7 @@ The game uses a centralized signal architecture through the GameState singleton:
 3. **UI Updates**: UI components connect to GameState signals and react to state changes
 
 This pattern ensures:
+
 - Single source of truth for game state
 - Decoupled components that communicate through signals
 - Easy debugging with centralized state tracking
@@ -105,8 +109,9 @@ This pattern ensures:
 - Multi-part countries (e.g., island nations) with multiple `<path>` elements sharing the same identifier will be rendered as separate sprites
 
 # important-instruction-reminders
+
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.
 ALWAYS run `/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script <file.gd>` after creating or significantly modifying GDScript files to catch syntax errors and warnings.

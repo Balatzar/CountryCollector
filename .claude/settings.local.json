@@ -8,7 +8,9 @@
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/static_clickable_map.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/rotating_static_map.gd)",
       "Bash(grep:*)",
-      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/dart.gd)"
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/dart.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/CountryProgressBar.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GlobeAndDartWithProgress.gd)"
     ],
     "deny": [],
     "ask": []

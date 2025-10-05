@@ -14,6 +14,7 @@ var scroll_offset: float = 0.0
 var map_width: float = 1024.0  # Width of the PNG images
 var map_copy: Node2D = null
 var copies_created: bool = false
+var is_paused: bool = true  # Start paused until loading is complete
 
 func _ready() -> void:
 	# Scale the map to fit better in the globe (maps are 1024x512)
@@ -32,13 +33,12 @@ func _ready() -> void:
 	# Set the viewport texture on the globe display
 	globe_display.texture = sub_viewport.get_texture()
 
-	# Wait for StaticClickableMap to load its sprites and GameState to register countries
-	if GameState.all_countries.is_empty():
-		await GameState.countries_loaded
-	else:
-		await get_tree().process_frame
-
-	_create_map_copy()
+func start_rotation() -> void:
+	"""Called externally when loading is complete and it's safe to copy sprites"""
+	if not copies_created:
+		_create_map_copy()
+	is_paused = false
+	print("[RotatingMap] Rotation started")
 
 func _create_map_copy() -> void:
 	if copies_created:
@@ -74,6 +74,10 @@ func _create_map_copy() -> void:
 	copies_created = true
 
 func _process(delta: float) -> void:
+	# Don't update if paused
+	if is_paused:
+		return
+
 	# Update scroll offset (in unscaled space)
 	scroll_offset += scroll_speed * delta
 
