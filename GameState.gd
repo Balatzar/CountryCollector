@@ -11,6 +11,8 @@ signal country_loading_progress(loaded: int, total: int)
 signal store_opened()
 signal card_acquired(card_data: Dictionary)
 signal notification_requested(text: String, position: Vector2, color: Color)
+signal xp_changed(current_xp: int, level: int)
+signal level_up(new_level: int)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -38,6 +40,11 @@ var acquired_cards: Array[Dictionary] = []
 var loading_in_progress: bool = false
 var countries_loaded_count: int = 0
 var countries_total_count: int = 0
+
+# XP and Level tracking
+const XP_PER_LEVEL: int = 100
+var xp: int = 0
+var level: int = 1
 
 
 func _ready() -> void:
@@ -198,3 +205,19 @@ func has_card(card_name: String) -> bool:
 # Get all acquired cards
 func get_acquired_cards() -> Array[Dictionary]:
 	return acquired_cards.duplicate()
+
+
+# Add experience points and handle level ups
+func add_xp(amount: int) -> void:
+	xp += amount
+
+	# Handle level ups with overflow
+	while xp >= XP_PER_LEVEL:
+		xp -= XP_PER_LEVEL
+		level += 1
+		level_up.emit(level)
+		print("[GameState] Level up! New level: ", level)
+
+	# Emit XP change signal
+	xp_changed.emit(xp, level)
+	print("[GameState] XP: ", xp, " / ", XP_PER_LEVEL, " | Level: ", level)
