@@ -1,7 +1,7 @@
 extends CanvasLayer
 
 ## Store overlay for displaying and selecting bonus cards
-## Shows 2 hardcoded test cards for UI demonstration
+## Generates random power-up cards with bonuses and maluses
 
 # Signals
 signal card_selected(card_data: Dictionary)
@@ -18,18 +18,8 @@ const CARD_SCENE := preload("res://Scenes/Card.tscn")
 # Card instances
 var card_instances: Array[Node] = []
 
-# Hardcoded test cards for UI demonstration
-var test_card_1: Dictionary = {
-	"name": "Test Card A",
-	"bonuses": ["Bonus 1", "Bonus 2"],
-	"maluses": ["Penalty 1"]
-}
-
-var test_card_2: Dictionary = {
-	"name": "Test Card B",
-	"bonuses": ["Bonus 3"],
-	"maluses": ["Penalty 2", "Penalty 3"]
-}
+# Current card choices generated for this store view
+var current_choices: Array[Dictionary] = []
 
 
 func _ready() -> void:
@@ -41,27 +31,50 @@ func _ready() -> void:
 
 
 func show_store() -> void:
-	"""Display the store with 2 hardcoded test cards"""
+	"""Display the store with randomly generated power-up cards"""
 	# Clear existing cards
 	_clear_cards()
 
-	# Create first card
-	var card_1 := CARD_SCENE.instantiate()
-	cards_container.add_child(card_1)
-	card_1.set_card_data(test_card_1)
-	card_1.card_selected.connect(_on_card_selected)
-	card_instances.append(card_1)
+	# Generate card choices from GameState
+	current_choices = GameState.generate_card_choices(2)
 
-	# Create second card
-	var card_2 := CARD_SCENE.instantiate()
-	cards_container.add_child(card_2)
-	card_2.set_card_data(test_card_2)
-	card_2.card_selected.connect(_on_card_selected)
-	card_instances.append(card_2)
+	# Create card instances for each choice
+	for i in range(current_choices.size()):
+		var card_choice = current_choices[i]
+		var card_instance := CARD_SCENE.instantiate()
+		cards_container.add_child(card_instance)
+
+		# Convert the card format to match what Card expects
+		var card_data = _format_card_for_display(card_choice)
+		# Store the original choice in the display data for later retrieval
+		card_data["_original_choice"] = card_choice
+		card_instance.set_card_data(card_data)
+		card_instance.card_selected.connect(_on_card_selected)
+		card_instances.append(card_instance)
 
 	# Show overlay with animation
 	show()
 	_animate_entrance()
+
+
+func _format_card_for_display(card_choice: Dictionary) -> Dictionary:
+	"""Convert power-up card format to display format"""
+	var bonuses: Array = []
+	var maluses: Array = []
+
+	# Extract bonus dictionary (with name and description)
+	if card_choice.has("bonus") and not card_choice["bonus"].is_empty():
+		bonuses.append(card_choice["bonus"])
+
+	# Extract malus dictionary (with name and description)
+	if card_choice.has("malus") and not card_choice["malus"].is_empty():
+		maluses.append(card_choice["malus"])
+
+	return {
+		"name": "Power-Up Card",
+		"bonuses": bonuses,
+		"maluses": maluses
+	}
 
 
 func hide_store() -> void:
@@ -81,12 +94,28 @@ func _clear_cards() -> void:
 		child.queue_free()
 
 
-func _on_card_selected(card_data: Dictionary) -> void:
-	"""Handle card selection"""
-	print("[StoreOverlay] Card selected: ", card_data.name)
+func _on_card_selected(display_data: Dictionary) -> void:
+	"""Handle card selection - retrieve the original power-up data from display data"""
+	print("[StoreOverlay] Card selected")
 
-	# Emit signal
-	card_selected.emit(card_data)
+	# Retrieve the original card choice from the display data
+	if not display_data.has("_original_choice"):
+		push_error("[StoreOverlay] Card data missing original choice!")
+		return
+
+	var card_choice: Dictionary = display_data["_original_choice"]
+
+	# Store both the bonus and malus in GameState
+	if card_choice.has("bonus") and not card_choice["bonus"].is_empty():
+		GameState.acquire_card(card_choice["bonus"])
+		print("[StoreOverlay] Acquired bonus: ", card_choice["bonus"].get("name", "Unknown"))
+
+	if card_choice.has("malus") and not card_choice["malus"].is_empty():
+		GameState.acquire_card(card_choice["malus"])
+		print("[StoreOverlay] Acquired malus: ", card_choice["malus"].get("name", "Unknown"))
+
+	# Emit signal with the full card choice
+	card_selected.emit(card_choice)
 
 	# Close the store
 	hide_store()

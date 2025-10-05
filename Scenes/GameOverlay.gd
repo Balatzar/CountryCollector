@@ -108,19 +108,31 @@ func _update_card_displays() -> void:
 	# Get all acquired cards from GameState
 	var acquired_cards := GameState.get_acquired_cards()
 
-	# Collect all bonuses and maluses from all cards
+	# Collect all bonuses and maluses from all power-ups
 	var all_bonuses: Array[String] = []
 	var all_maluses: Array[String] = []
 
-	for card in acquired_cards:
-		var bonuses: Array = card.get("bonuses", [])
-		var maluses: Array = card.get("maluses", [])
+	for power_up in acquired_cards:
+		# Check if this is a new-style power-up (has "type" field)
+		if power_up.has("type"):
+			var power_up_name: String = power_up.get("name", "Unknown")
+			var power_up_type: int = power_up.get("type", 0)
 
-		for bonus in bonuses:
-			all_bonuses.append(str(bonus))
+			# PowerUpDefinitions.PowerUpType enum: BONUS = 0, MALUS = 1
+			if power_up_type == 0:  # BONUS
+				all_bonuses.append(power_up_name)
+			else:  # MALUS
+				all_maluses.append(power_up_name)
+		else:
+			# Legacy format: card with bonuses/maluses arrays
+			var bonuses: Array = power_up.get("bonuses", [])
+			var maluses: Array = power_up.get("maluses", [])
 
-		for malus in maluses:
-			all_maluses.append(str(malus))
+			for bonus in bonuses:
+				all_bonuses.append(str(bonus))
+
+			for malus in maluses:
+				all_maluses.append(str(malus))
 
 	# Populate bonus container
 	if all_bonuses.size() > 0:

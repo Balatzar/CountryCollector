@@ -72,20 +72,44 @@ func _update_card_display() -> void:
 	# Add bonus labels
 	var bonuses: Array = card_data.get("bonuses", [])
 	for bonus in bonuses:
+		# Bonus can be either a string or a dictionary
+		var bonus_text := ""
+		if bonus is String:
+			bonus_text = str(bonus)
+		elif bonus is Dictionary:
+			# Display name and description
+			var bonus_name: String = bonus.get("name", "Unknown Bonus")
+			var bonus_desc: String = bonus.get("description", "")
+			bonus_text = bonus_name
+			if bonus_desc != "":
+				bonus_text += "\n" + bonus_desc
+
 		var label := Label.new()
-		label.text = "✓ " + str(bonus)
+		label.text = "✓ " + bonus_text
 		label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))  # Green
-		label.add_theme_font_size_override("font_size", 16)
+		label.add_theme_font_size_override("font_size", 14)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		bonus_container.add_child(label)
 	
 	# Add malus labels
 	var maluses: Array = card_data.get("maluses", [])
 	for malus in maluses:
+		# Malus can be either a string or a dictionary
+		var malus_text := ""
+		if malus is String:
+			malus_text = str(malus)
+		elif malus is Dictionary:
+			# Display name and description
+			var malus_name: String = malus.get("name", "Unknown Malus")
+			var malus_desc: String = malus.get("description", "")
+			malus_text = malus_name
+			if malus_desc != "":
+				malus_text += "\n" + malus_desc
+
 		var label := Label.new()
-		label.text = "✗ " + str(malus)
+		label.text = "✗ " + malus_text
 		label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))  # Red
-		label.add_theme_font_size_override("font_size", 16)
+		label.add_theme_font_size_override("font_size", 14)
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		malus_container.add_child(label)
 

@@ -1,6 +1,7 @@
 extends Node
 
 const CountryNames = preload("res://CountryNames.gd")
+const PowerUpDefinitions = preload("res://PowerUpDefinitions.gd")
 
 # Signals
 signal countries_loaded()
@@ -222,6 +223,15 @@ func has_card(card_name: String) -> bool:
 # Get all acquired cards
 func get_acquired_cards() -> Array[Dictionary]:
 	return acquired_cards.duplicate()
+
+
+# Generate random card choices for the store
+func generate_card_choices(num_choices: int = 2) -> Array[Dictionary]:
+	var choices: Array[Dictionary] = []
+	for i in range(num_choices):
+		var card = PowerUpDefinitions.generate_card(acquired_cards)
+		choices.append(card)
+	return choices
 
 
 # Get XP reward for a country based on its size
