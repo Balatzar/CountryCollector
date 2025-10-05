@@ -33,6 +33,7 @@ extends Node2D
 # Projectile animation configuration
 @export_group("Projectile Animation")
 @export var projectile_rotation_factor: float = 0.2  ## How much the projectile rotates toward the curve tangent (0=none, 1=full)
+@export var projectile_duration: float = 0.35  ## Fixed duration for all dart throws (in seconds)
 
 # Sprite references
 @onready var sprite_left: Sprite2D = $SpriteLeft
@@ -48,6 +49,9 @@ extends Node2D
 var target_x: float = 0.0
 var current_x: float = 0.0
 var fixed_y: float = 0.0
+
+# Shot timing
+var shot_start_time: float = 0.0
 
 func _ready() -> void:
 	# Calculate fixed Y position (bottom of screen)
@@ -240,6 +244,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_start_throw_to((event as InputEventMouseButton).position)
 
 func _start_throw_to(mouse_pos: Vector2) -> void:
+	# Record shot start time
+	shot_start_time = Time.get_ticks_msec() / 1000.0
+
 	var start_tip: Vector2 = _get_dart_tip_position()
 	var controls := _compute_bezier_controls(start_tip, mouse_pos)
 	var p0: Vector2 = controls[0]
@@ -252,14 +259,16 @@ func _start_throw_to(mouse_pos: Vector2) -> void:
 	# Store initial rotation for interpolation
 	var initial_rotation: float = proj.rotation
 	proj.set_meta("initial_rotation", initial_rotation)
-	var distance: float = start_tip.distance_to(mouse_pos)
-	var duration: float = clamp(distance / 1400.0, 0.25, 0.9)
 	var tween := create_tween()
 	var cb := Callable(self, "_update_projectile_along_bezier").bind(proj, p0, p1, p2, p3)
-	tween.tween_method(cb, 0.0, 1.0, duration)
+	tween.tween_method(cb, 0.0, 1.0, projectile_duration)
 	tween.finished.connect(func():
 		if is_instance_valid(proj):
 			proj.queue_free()
+		# Print shot duration
+		var shot_end_time: float = Time.get_ticks_msec() / 1000.0
+		var shot_duration: float = shot_end_time - shot_start_time
+		print("Shot duration: %.3f seconds" % shot_duration)
 	)
 
 func _update_projectile_along_bezier(t: float, proj: Node2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> void:
@@ -364,5 +373,3 @@ func _compute_bezier_controls(start: Vector2, end: Vector2) -> Array[Vector2]:
 	var p1: Vector2 = p0 + n * len_start + dir * f_start
 	var p2: Vector2 = p3 - dir * f_end - n * len_end
 	return [p0, p1, p2, p3]
-
-# [augment] EOF marker
