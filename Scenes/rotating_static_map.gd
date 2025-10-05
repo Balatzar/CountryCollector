@@ -26,6 +26,7 @@ const COLOR_HIT = Color.LIGHT_GREEN
 const COLOR_MISS = Color.ORANGE
 const COLOR_COUNTRY = Color.CYAN
 const COLOR_FUN = Color.YELLOW
+const COLOR_XP = Color.GOLD
 
 # Fun notification messages
 const FUN_SUCCESS_MESSAGES = [
@@ -117,6 +118,17 @@ func _on_country_collected(country_id: String) -> void:
 	var country_name := CountryNames.get_country_name(country_id)
 	GameState.show_notification(country_name, GameState.last_dart_position, COLOR_COUNTRY)
 
+	# Wait another 100ms before showing country size
+	await get_tree().create_timer(0.1).timeout
+	var country_size := CountryNames.get_country_size(country_id)
+	var size_text := _get_size_text(country_size)
+	GameState.show_notification("You hit a " + size_text + " country!", GameState.last_dart_position, COLOR_COUNTRY)
+
+	# Wait another 100ms before showing XP reward
+	await get_tree().create_timer(0.1).timeout
+	var xp_reward := GameState.get_xp_reward_for_country(country_id)
+	GameState.show_notification("+" + str(xp_reward) + " XP", GameState.last_dart_position, COLOR_XP)
+
 	# Wait another 100ms before showing fun success message
 	await get_tree().create_timer(0.1).timeout
 	var fun_msg = FUN_SUCCESS_MESSAGES[randi() % FUN_SUCCESS_MESSAGES.size()]
@@ -125,6 +137,22 @@ func _on_country_collected(country_id: String) -> void:
 	# Rebuild map copies to reflect the new white color
 	if copies_created and map_copy != null:
 		_rebuild_map_copy()
+
+
+func _get_size_text(size: CountryNames.Size) -> String:
+	match size:
+		CountryNames.Size.MICROSCOPIC:
+			return "Microscopic"
+		CountryNames.Size.SMALL:
+			return "Small"
+		CountryNames.Size.MEDIUM:
+			return "Medium"
+		CountryNames.Size.BIG:
+			return "Big"
+		CountryNames.Size.HUGE:
+			return "Huge"
+		_:
+			return "Unknown"
 
 func _create_map_copy() -> void:
 	if copies_created:

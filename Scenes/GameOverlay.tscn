@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3 uid="uid://dkm8y5qvxh3yw"]
+[gd_scene load_steps=5 format=3 uid="uid://dkm8y5qvxh3yw"]
 
 [ext_resource type="Script" uid="uid://jnfa2fafub0" path="res://Scenes/GameOverlay.gd" id="1_overlay"]
+[ext_resource type="PackedScene" uid="uid://ntoi7g13nd5p" path="res://Scenes/XbBar.tscn" id="2_jsrhp"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.08, 0.08, 0.12, 0.95)
@@ -20,32 +21,6 @@ shadow_offset = Vector2(0, 6)
 content_margin_top = 2.0
 content_margin_bottom = 2.0
 bg_color = Color(1, 0.7, 0.1, 0.5)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_background"]
-bg_color = Color(0.15, 0.15, 0.2, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.3, 0.4, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
-bg_color = Color(1, 0.7, 0.1, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.85, 0.3, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-shadow_color = Color(1, 0.7, 0.1, 0.4)
-shadow_size = 8
 
 [node name="GameOverlay" type="CanvasLayer"]
 script = ExtResource("1_overlay")
@@ -199,38 +174,5 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 5
 
-[node name="XPBarContainer" type="MarginContainer" parent="MarginContainer"]
+[node name="XPBarContainer" parent="MarginContainer" instance=ExtResource("2_jsrhp")]
 layout_mode = 2
-size_flags_vertical = 8
-mouse_filter = 2
-theme_override_constants/margin_left = 100
-theme_override_constants/margin_right = 100
-theme_override_constants/margin_bottom = 10
-
-[node name="XPPanel" type="PanelContainer" parent="MarginContainer/XPBarContainer"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="XPHBox" type="HBoxContainer" parent="MarginContainer/XPBarContainer/XPPanel"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="XPLabel" type="Label" parent="MarginContainer/XPBarContainer/XPPanel/XPHBox"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 20
-text = "Level 1"
-horizontal_alignment = 1
-uppercase = true
-
-[node name="XPProgressBar" type="ProgressBar" parent="MarginContainer/XPBarContainer/XPPanel/XPHBox"]
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/background = SubResource("StyleBoxFlat_xp_background")
-theme_override_styles/fill = SubResource("StyleBoxFlat_xp_fill")
-value = 50.0
-show_percentage = false
