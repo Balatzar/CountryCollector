@@ -3,7 +3,8 @@ extends Node2D
 const CountryNames = preload("res://CountryNames.gd")
 
 ## Configuration
-@export var scroll_speed: float = 50.0  # Pixels per second
+@export var base_scroll_speed: float = 150.0  # Base pixels per second
+var scroll_speed: float  # Current scroll speed (base * multiplier)
 
 ## Node references
 @onready var sub_viewport: SubViewport = $SubViewport
@@ -76,6 +77,10 @@ func _ready() -> void:
 	GameState.dart_thrown.connect(_on_dart_thrown)
 	GameState.dart_landed.connect(_on_dart_landed)
 	GameState.country_collected.connect(_on_country_collected)
+	GameState.rotation_speed_changed.connect(_on_rotation_speed_changed)
+
+	# Initialize scroll speed with current multiplier
+	_update_scroll_speed()
 
 func start_rotation() -> void:
 	"""Called externally when loading is complete and it's safe to copy sprites"""
@@ -258,3 +263,15 @@ func _unhandled_input(event: InputEvent) -> void:
 							GameState.set_pending_country(country_id)
 					else:
 							print("No country found at color: ", color)
+
+
+func _on_rotation_speed_changed() -> void:
+	"""Handle rotation speed changes from GameState"""
+	_update_scroll_speed()
+
+
+func _update_scroll_speed() -> void:
+	"""Update scroll speed based on current multiplier from GameState"""
+	var multiplier = GameState.get_rotation_speed_multiplier()
+	scroll_speed = base_scroll_speed * multiplier
+	print("[RotatingMap] Scroll speed updated: ", scroll_speed, " (multiplier: ", multiplier, ")")

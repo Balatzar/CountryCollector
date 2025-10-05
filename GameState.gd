@@ -16,6 +16,7 @@ signal card_acquired(card_data: Dictionary)
 signal notification_requested(text: String, position: Vector2, color: Color)
 signal xp_changed(current_xp: int, level: int)
 signal level_up(new_level: int)
+signal rotation_speed_changed(multiplier: float)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -217,6 +218,11 @@ func acquire_card(card_data: Dictionary) -> void:
 		remaining_darts += 5
 		darts_changed.emit(remaining_darts)
 		print("[GameState] Added 5 darts, new count: ", remaining_darts)
+	elif card_id.begins_with("slower_map_") or card_id.begins_with("faster_map_"):
+		# Update rotation speed when speed-affecting cards are acquired
+		var new_multiplier = get_rotation_speed_multiplier()
+		rotation_speed_changed.emit(new_multiplier)
+		print("[GameState] Rotation speed multiplier updated: ", new_multiplier)
 
 
 # Check if a specific card has been acquired
@@ -230,6 +236,29 @@ func has_card(card_name: String) -> bool:
 # Get all acquired cards
 func get_acquired_cards() -> Array[Dictionary]:
 	return acquired_cards.duplicate()
+
+
+# Get the current rotation speed multiplier based on acquired cards
+func get_rotation_speed_multiplier() -> float:
+	var multiplier := 1.0
+
+	# Check for slower map bonuses (reduce speed)
+	if has_card("Slower Map III"):
+		multiplier *= 0.5  # 50% reduction
+	elif has_card("Slower Map II"):
+		multiplier *= 0.7  # 30% reduction
+	elif has_card("Slower Map I"):
+		multiplier *= 0.85  # 15% reduction
+
+	# Check for faster map maluses (increase speed)
+	if has_card("Faster Map III"):
+		multiplier *= 1.6  # 60% increase
+	elif has_card("Faster Map II"):
+		multiplier *= 1.4  # 40% increase
+	elif has_card("Faster Map I"):
+		multiplier *= 1.2  # 20% increase
+
+	return multiplier
 
 
 # Generate random card choices for the store

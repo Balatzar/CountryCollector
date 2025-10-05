@@ -16,7 +16,7 @@ shader_parameter/tex_aspect = 1.0
 
 [node name="RotatingStaticMap" type="Node2D"]
 script = ExtResource("1_lug42")
-scroll_speed = 150.0
+base_scroll_speed = 150.0
 
 [node name="SubViewport" type="SubViewport" parent="."]
 transparent_bg = true
