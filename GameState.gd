@@ -17,6 +17,7 @@ signal notification_requested(text: String, position: Vector2, color: Color)
 signal xp_changed(current_xp: int, level: int)
 signal level_up(new_level: int)
 signal rotation_speed_changed(multiplier: float)
+signal globe_scale_changed(multiplier: float)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -223,6 +224,11 @@ func acquire_card(card_data: Dictionary) -> void:
 		var new_multiplier = get_rotation_speed_multiplier()
 		rotation_speed_changed.emit(new_multiplier)
 		print("[GameState] Rotation speed multiplier updated: ", new_multiplier)
+	elif card_id.begins_with("unzoom_"):
+		# Update globe scale when unzoom maluses are acquired
+		var new_multiplier = get_globe_scale_multiplier()
+		globe_scale_changed.emit(new_multiplier)
+		print("[GameState] Globe scale multiplier updated: ", new_multiplier)
 
 
 # Check if a specific card has been acquired
@@ -257,6 +263,21 @@ func get_rotation_speed_multiplier() -> float:
 		multiplier *= 1.4  # 40% increase
 	elif has_card("Faster Map I"):
 		multiplier *= 1.2  # 20% increase
+
+	return multiplier
+
+
+# Get the current globe scale multiplier based on acquired unzoom maluses
+func get_globe_scale_multiplier() -> float:
+	var multiplier := 1.0
+
+	# Check for unzoom maluses (make globe smaller)
+	if has_card("Unzoom III"):
+		multiplier *= 0.5  # 50% reduction
+	elif has_card("Unzoom II"):
+		multiplier *= 0.7  # 30% reduction
+	elif has_card("Unzoom I"):
+		multiplier *= 0.85  # 15% reduction
 
 	return multiplier
 

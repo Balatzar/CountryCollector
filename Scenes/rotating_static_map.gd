@@ -6,6 +6,9 @@ const CountryNames = preload("res://CountryNames.gd")
 @export var base_scroll_speed: float = 150.0  # Base pixels per second
 var scroll_speed: float  # Current scroll speed (base * multiplier)
 
+# Base scale for the globe display
+var base_globe_scale: Vector2 = Vector2.ONE
+
 ## Node references
 @onready var sub_viewport: SubViewport = $SubViewport
 @onready var world_scroller: Node2D = $SubViewport/WorldScroller
@@ -73,14 +76,19 @@ func _ready() -> void:
 	# Set the viewport texture on the globe display
 	globe_display.texture = sub_viewport.get_texture()
 
+	# Store the base scale of the globe display
+	base_globe_scale = globe_display.scale
+
 	# Connect to game signals
 	GameState.dart_thrown.connect(_on_dart_thrown)
 	GameState.dart_landed.connect(_on_dart_landed)
 	GameState.country_collected.connect(_on_country_collected)
 	GameState.rotation_speed_changed.connect(_on_rotation_speed_changed)
+	GameState.globe_scale_changed.connect(_on_globe_scale_changed)
 
-	# Initialize scroll speed with current multiplier
+	# Initialize scroll speed and globe scale with current multipliers
 	_update_scroll_speed()
+	_update_globe_scale()
 
 func start_rotation() -> void:
 	"""Called externally when loading is complete and it's safe to copy sprites"""
@@ -265,13 +273,34 @@ func _unhandled_input(event: InputEvent) -> void:
 							print("No country found at color: ", color)
 
 
-func _on_rotation_speed_changed() -> void:
+func _on_rotation_speed_changed(_multiplier: float) -> void:
 	"""Handle rotation speed changes from GameState"""
 	_update_scroll_speed()
+
+
+func _on_globe_scale_changed(_multiplier: float) -> void:
+	"""Handle globe scale changes from GameState"""
+	_update_globe_scale()
 
 
 func _update_scroll_speed() -> void:
 	"""Update scroll speed based on current multiplier from GameState"""
 	var multiplier = GameState.get_rotation_speed_multiplier()
 	scroll_speed = base_scroll_speed * multiplier
-	print("[RotatingMap] Scroll speed updated: ", scroll_speed, " (multiplier: ", multiplier, ")")
+
+
+func _update_globe_scale() -> void:
+	"""Update globe scale based on current multiplier from GameState"""
+	var multiplier = GameState.get_globe_scale_multiplier()
+
+	# Get the center of the globe before scaling
+	var globe_rect = globe_display.get_rect()
+	var center_before = globe_display.position + globe_rect.size * globe_display.scale / 2.0
+
+	# Apply new scale
+	var new_scale = base_globe_scale * multiplier
+	globe_display.scale = new_scale
+
+	# Calculate new center position and adjust to keep globe centered
+	var center_after = globe_display.position + globe_rect.size * new_scale / 2.0
+	globe_display.position += center_before - center_after
