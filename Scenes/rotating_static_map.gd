@@ -32,22 +32,33 @@ func _ready() -> void:
 	# Set the viewport texture on the globe display
 	globe_display.texture = sub_viewport.get_texture()
 
-	# Wait for StaticClickableMap to load its sprites
-	await get_tree().process_frame
+	# Wait for StaticClickableMap to load its sprites and GameState to register countries
+	if GameState.all_countries.is_empty():
+		await GameState.countries_loaded
+	else:
+		await get_tree().process_frame
+
 	_create_map_copy()
 
 func _create_map_copy() -> void:
 	if copies_created:
 		return
 
+	print("[RotatingMap] Creating map copy...")
+	print("[RotatingMap] StaticMap has ", static_map.get_child_count(), " children")
+
 	# Create a duplicate container for seamless wrapping
 	map_copy = Node2D.new()
 	world_scroller.add_child(map_copy)
 	map_copy.position = Vector2(map_width, 0)
 
+	var sprite_count = 0
 	# Copy all sprites from the static map (visual only, no collision)
 	for child in static_map.get_children():
 		if child is Sprite2D:
+			if child.texture == null:
+				print("[RotatingMap] WARNING: Sprite has null texture: ", child.name)
+				continue
 			var sprite_copy = Sprite2D.new()
 			sprite_copy.texture = child.texture
 			sprite_copy.centered = child.centered
@@ -57,7 +68,9 @@ func _create_map_copy() -> void:
 			sprite_copy.modulate = child.modulate
 			# Don't copy Area2D or collision - purely visual
 			map_copy.add_child(sprite_copy)
+			sprite_count += 1
 
+	print("[RotatingMap] Created ", sprite_count, " sprite copies")
 	copies_created = true
 
 func _process(delta: float) -> void:
