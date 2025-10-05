@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3 uid="uid://cyv40rpb54q4q"]
+
+[ext_resource type="PackedScene" uid="uid://dkm8y5qvxh3yw" path="res://Scenes/GameOverlay.tscn" id="1_overlay"]
+[ext_resource type="Script" uid="uid://cjevarwdb0voe" path="res://Scenes/XPBarTest.gd" id="2_test"]
+
+[node name="XPBarTest" type="Node2D"]
+script = ExtResource("2_test")
+
+[node name="GameOverlay" parent="." instance=ExtResource("1_overlay")]
+follow_viewport_scale = 1.0
+
+[node name="TestUILayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="TestPanel" type="PanelContainer" parent="TestUILayer"]
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 450.0
+offset_bottom = 300.0
+
+[node name="VBox" type="VBoxContainer" parent="TestUILayer/TestPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Title" type="Label" parent="TestUILayer/TestPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "XP Bar Animation Test"
+horizontal_alignment = 1
+
+[node name="InfoLabel" type="Label" parent="TestUILayer/TestPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Current XP: 50%
+
+Click buttons to test animations:
+• Add XP: +25 XP with smooth fill
+• Level Up: Celebration animation
+• Reset: Back to 50%"
+autowrap_mode = 3
+
+[node name="AddXPButton" type="Button" parent="TestUILayer/TestPanel/VBox"]
+layout_mode = 2
+text = "Add +25 XP"
+
+[node name="LevelUpButton" type="Button" parent="TestUILayer/TestPanel/VBox"]
+layout_mode = 2
+text = "Trigger Level Up Animation"
+
+[node name="ResetButton" type="Button" parent="TestUILayer/TestPanel/VBox"]
+layout_mode = 2
+text = "Reset to 50%"
