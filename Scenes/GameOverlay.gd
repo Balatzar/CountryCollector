@@ -1,39 +1,34 @@
 extends CanvasLayer
 
-## Beautiful game overlay UI with timer, dart counter, and collected countries list
-
-# Timer variables
-@export var countdown_time: int = 60
-var current_time: int = 60
+## Beautiful game overlay UI with dart counter, collected countries list, and bonus/malus displays
 
 # Node references
-@onready var timer_label: Label = $MarginContainer/LayoutContainer/TopBar/TimerPanel/TimerContainer/TimeLabel
-@onready var countdown_timer: Timer = $CountdownTimer
-@onready var dart_container: HBoxContainer = $MarginContainer/LayoutContainer/TopBar/DartPanel/DartVBox/DartContainer
-@onready var countries_list: VBoxContainer = $MarginContainer/LayoutContainer/RightPanel/CountriesVBox/ScrollContainer/CountriesList
+@onready var dart_container: HBoxContainer = $MarginContainer/LayoutContainer/CenterAndRightContainer/TopBar/DartPanel/DartVBox/DartContainer
+@onready var countries_list: VBoxContainer = $MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel/CountriesVBox/ScrollContainer/CountriesList
+@onready var bonus_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/BonusPanel
+@onready var bonus_container: VBoxContainer = $MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox/BonusEffectsList
+@onready var malus_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/MalusPanel
+@onready var malus_container: VBoxContainer = $MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox/MalusEffectsList
 
 # Dart icon references for updating
 var dart_icons: Array[TextureRect] = []
 
 
 func _ready() -> void:
-	# Initialize timer
-	current_time = countdown_time
-	_update_timer_display()
-
-	# Start countdown
-	countdown_timer.start()
-
 	# Setup dart counter
 	_setup_dart_counter()
 
 	# Connect to GameState signals
 	GameState.country_collected.connect(_on_country_collected)
 	GameState.darts_changed.connect(_on_darts_changed)
+	GameState.card_acquired.connect(_on_card_acquired)
 
 	# Initialize countries list with any already collected countries
 	for country_id in GameState.collected_countries:
 		_add_country_to_list(country_id)
+
+	# Initialize bonus/malus displays
+	_update_card_displays()
 
 
 func _setup_dart_counter() -> void:
@@ -66,27 +61,7 @@ func _setup_dart_counter() -> void:
 		dart_icons.append(dart_icon)
 
 
-func _on_countdown_timer_timeout() -> void:
-	current_time -= 1
-	_update_timer_display()
-	
-	if current_time <= 0:
-		countdown_timer.stop()
-		# Game over logic could go here
 
-
-func _update_timer_display() -> void:
-	var minutes := current_time / 60
-	var seconds := current_time % 60
-	timer_label.text = "%02d:%02d" % [minutes, seconds]
-	
-	# Add visual feedback for low time
-	if current_time <= 10:
-		timer_label.add_theme_color_override("font_color", Color.RED)
-	elif current_time <= 30:
-		timer_label.add_theme_color_override("font_color", Color.ORANGE)
-	else:
-		timer_label.add_theme_color_override("font_color", Color.WHITE)
 
 
 func _on_country_collected(country_id: String) -> void:
@@ -113,4 +88,69 @@ func _add_country_to_list(country_id: String) -> void:
 	country_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 	country_label.add_theme_constant_override("outline_size", 4)
 	countries_list.add_child(country_label)
+
+
+func _on_card_acquired(_card_data: Dictionary) -> void:
+	"""Handle when a card is acquired - update the bonus/malus displays"""
+	_update_card_displays()
+
+
+func _update_card_displays() -> void:
+	"""Update the bonus and malus containers based on acquired cards"""
+	# Clear existing content
+	_clear_container(bonus_container)
+	_clear_container(malus_container)
+
+	# Get all acquired cards from GameState
+	var acquired_cards := GameState.get_acquired_cards()
+
+	# Collect all bonuses and maluses from all cards
+	var all_bonuses: Array[String] = []
+	var all_maluses: Array[String] = []
+
+	for card in acquired_cards:
+		var bonuses: Array = card.get("bonuses", [])
+		var maluses: Array = card.get("maluses", [])
+
+		for bonus in bonuses:
+			all_bonuses.append(str(bonus))
+
+		for malus in maluses:
+			all_maluses.append(str(malus))
+
+	# Populate bonus container
+	if all_bonuses.size() > 0:
+		for bonus_text in all_bonuses:
+			var label := Label.new()
+			label.text = "✓ " + bonus_text
+			label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))  # Green
+			label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+			label.add_theme_constant_override("outline_size", 3)
+			label.add_theme_font_size_override("font_size", 18)
+			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			bonus_container.add_child(label)
+		bonus_panel.visible = true
+	else:
+		bonus_panel.visible = false
+
+	# Populate malus container
+	if all_maluses.size() > 0:
+		for malus_text in all_maluses:
+			var label := Label.new()
+			label.text = "✗ " + malus_text
+			label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))  # Red
+			label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+			label.add_theme_constant_override("outline_size", 3)
+			label.add_theme_font_size_override("font_size", 18)
+			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			malus_container.add_child(label)
+		malus_panel.visible = true
+	else:
+		malus_panel.visible = false
+
+
+func _clear_container(container: VBoxContainer) -> void:
+	"""Clear all children from a container"""
+	for child in container.get_children():
+		child.queue_free()
 

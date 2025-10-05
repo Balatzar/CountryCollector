@@ -30,56 +30,96 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="LayoutContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="LayoutContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
 
-[node name="TopBar" type="HBoxContainer" parent="MarginContainer/LayoutContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/LayoutContainer"]
 layout_mode = 2
-theme_override_constants/separation = 30
+size_flags_horizontal = 0
+theme_override_constants/separation = 20
 
-[node name="TimerPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/TopBar"]
-custom_minimum_size = Vector2(220, 0)
+[node name="BonusPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/LeftPanel"]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="TimerContainer" type="VBoxContainer" parent="MarginContainer/LayoutContainer/TopBar/TimerPanel"]
+[node name="BonusVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel"]
 layout_mode = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = 10
 
-[node name="TimerTitle" type="Label" parent="MarginContainer/LayoutContainer/TopBar/TimerPanel/TimerContainer"]
+[node name="BonusTitle" type="Label" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
+theme_override_colors/font_color = Color(0.3, 1.0, 0.5, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 24
-text = "⏱ TIME"
+text = "✓ BONUSES"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="TimeLabel" type="Label" parent="MarginContainer/LayoutContainer/TopBar/TimerPanel/TimerContainer"]
+[node name="BonusSeparator" type="HSeparator" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 56
-text = "01:00"
-horizontal_alignment = 1
+theme_override_constants/separation = 10
+theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
 
-[node name="DartPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/TopBar"]
+[node name="BonusEffectsList" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MalusPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/LeftPanel"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MalusVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MalusTitle" type="Label" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.3, 0.3, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+text = "✗ MALUSES"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="MalusSeparator" type="HSeparator" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
+
+[node name="MalusEffectsList" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CenterAndRightContainer" type="VBoxContainer" parent="MarginContainer/LayoutContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TopBar" type="HBoxContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="DartPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="DartVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/TopBar/DartPanel"]
+[node name="DartVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/TopBar/DartPanel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="DartTitle" type="Label" parent="MarginContainer/LayoutContainer/TopBar/DartPanel/DartVBox"]
+[node name="DartTitle" type="Label" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/TopBar/DartPanel/DartVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -89,26 +129,26 @@ text = "🎯 DARTS"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="DartContainer" type="HBoxContainer" parent="MarginContainer/LayoutContainer/TopBar/DartPanel/DartVBox"]
+[node name="DartContainer" type="HBoxContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/TopBar/DartPanel/DartVBox"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 8
 
-[node name="Spacer" type="Control" parent="MarginContainer/LayoutContainer"]
+[node name="Spacer" type="Control" parent="MarginContainer/LayoutContainer/CenterAndRightContainer"]
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="RightPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer"]
+[node name="RightPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer"]
 custom_minimum_size = Vector2(350, 450)
 layout_mode = 2
 size_flags_horizontal = 8
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="CountriesVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/RightPanel"]
+[node name="CountriesVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="CountriesTitle" type="Label" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox"]
+[node name="CountriesTitle" type="Label" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel/CountriesVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -118,24 +158,18 @@ text = "🌍 COLLECTED"
 horizontal_alignment = 1
 uppercase = true
 
-[node name="Separator" type="HSeparator" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox"]
+[node name="Separator" type="HSeparator" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel/CountriesVBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
 theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel/CountriesVBox"]
 custom_minimum_size = Vector2(0, 350)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CountriesList" type="VBoxContainer" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox/ScrollContainer"]
+[node name="CountriesList" type="VBoxContainer" parent="MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel/CountriesVBox/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 5
-
-[node name="CountdownTimer" type="Timer" parent="."]
-wait_time = 1.0
-autostart = false
-
-[connection signal="timeout" from="CountdownTimer" to="." method="_on_countdown_timer_timeout"]
 
