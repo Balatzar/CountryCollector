@@ -5,6 +5,7 @@ extends MarginContainer
 # Node references
 @onready var xp_progress_bar: ProgressBar = $XPPanel/XPHBox/XPProgressBar
 @onready var xp_panel: PanelContainer = $XPPanel
+@onready var xp_label: Label = $XPPanel/XPHBox/XPLabel
 
 # XP bar animation state
 var shimmer_time: float = 0.0
@@ -18,8 +19,15 @@ func _ready() -> void:
 	xp_panel.pivot_offset = xp_panel.size / 2.0
 	xp_panel.resized.connect(_on_xp_panel_resized)
 
+	# Connect to GameState signals
+	GameState.xp_changed.connect(_on_xp_changed)
+	GameState.level_up.connect(_on_level_up)
+
 	# Setup XP bar animations
 	_setup_xp_bar()
+
+	# Initialize progress bar with current XP
+	_update_xp_display()
 
 
 func _process(delta: float) -> void:
@@ -55,9 +63,33 @@ func _start_xp_pulse_animation() -> void:
 	tween.tween_property(xp_panel, "modulate:a", 1.0, 1.0).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 
 
+func _on_xp_changed(current_xp: int, current_level: int) -> void:
+	"""Handle XP change from GameState"""
+	# Update level label
+	xp_label.text = "Level %d" % current_level
+
+	# Calculate percentage for progress bar (0-100)
+	var xp_percentage: float = (float(current_xp) / float(GameState.XP_PER_LEVEL)) * 100.0
+	animate_xp_gain(xp_percentage)
+
+
+func _on_level_up(new_level: int) -> void:
+	"""Handle level up from GameState"""
+	animate_xp_level_up()
+
+
+func _update_xp_display() -> void:
+	"""Update the XP bar to show current XP without animation"""
+	# Update level label
+	xp_label.text = "Level %d" % GameState.level
+
+	# Update progress bar
+	var xp_percentage: float = (float(GameState.xp) / float(GameState.XP_PER_LEVEL)) * 100.0
+	xp_progress_bar.value = xp_percentage
+
+
 func animate_xp_gain(new_value: float) -> void:
-	"""Animate the XP bar filling to a new value
-	Call this function when XP increases (not connected to game logic yet)"""
+	"""Animate the XP bar filling to a new value"""
 	# Smooth fill animation
 	var tween := create_tween()
 	tween.tween_property(xp_progress_bar, "value", new_value, 0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
@@ -68,8 +100,7 @@ func animate_xp_gain(new_value: float) -> void:
 
 
 func animate_xp_level_up() -> void:
-	"""Celebration animation when XP bar reaches 100%
-	Call this function when player levels up (not connected to game logic yet)"""
+	"""Celebration animation when player levels up"""
 
 	# Flash effect
 	var flash_tween := create_tween()
