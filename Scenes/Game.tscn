@@ -1,12 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://bf4tw7lmwlwuj"]
+[gd_scene load_steps=6 format=3 uid="uid://bf4tw7lmwlwuj"]
 
-[ext_resource type="PackedScene" uid="uid://vpm14equhjq1" path="res://Scenes/GlobeAndDartWithProgress.tscn" id="1_gl6un"]
-[ext_resource type="Script" uid="uid://bheof2fagiofc" path="res://Scenes/Game.gd" id="1_kldst"]
+[ext_resource type="PackedScene" path="res://Scenes/GlobeAndDartWithProgress.tscn" id="1_gl6un"]
+[ext_resource type="Script" path="res://Scenes/Game.gd" id="1_kldst"]
+[ext_resource type="Texture2D" uid="uid://btupb7t4fok1f" path="res://Assets/bg.png" id="2_b2bpf"]
 [ext_resource type="PackedScene" uid="uid://dkm8y5qvxh3yw" path="res://Scenes/GameOverlay.tscn" id="2_j5yw3"]
-[ext_resource type="PackedScene" uid="uid://bk3qxoc3yvyp2" path="res://Scenes/NotificationDisplay.tscn" id="4_b2bpf"]
+[ext_resource type="PackedScene" path="res://Scenes/NotificationDisplay.tscn" id="4_b2bpf"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_kldst")
+
+[node name="Bg" type="Sprite2D" parent="."]
+position = Vector2(916.25, 612.25)
+scale = Vector2(1.432567, 1.3512222)
+texture = ExtResource("2_b2bpf")
 
 [node name="GlobeAndDartWithProgress" parent="." instance=ExtResource("1_gl6un")]
 
