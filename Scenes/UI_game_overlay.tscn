@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://cae23cgmqqrgu"]
+
+[node name="OverlayUI" type="Node2D"]
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+
+[node name="DartsLabel" type="Label" parent="Control/VBoxContainer"]
+layout_mode = 2
+text = "Remaining darts : 10"
+
+[node name="CountriesLabel" type="Label" parent="Control/VBoxContainer"]
+layout_mode = 2
+text = "Collected Countries : 0"
+
+[node name="Timer" type="Label" parent="Control/VBoxContainer"]
+layout_mode = 2
+text = "Time remaining : 0"
+
+[node name="CountdownTimer" type="Timer" parent="."]
+autostart = true
