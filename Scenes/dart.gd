@@ -52,6 +52,7 @@ var fixed_y: float = 0.0
 
 # Shot timing
 var shot_start_time: float = 0.0
+var is_throwing: bool = false
 
 func _ready() -> void:
 	# Calculate fixed Y position (bottom of screen)
@@ -129,10 +130,12 @@ func _process(_delta: float) -> void:
 			s.position = s.get_meta("base_pos")
 
 	# Update which sprite is visible based on screen position
-	_update_sprite_visibility()
+	if not is_throwing:
+		_update_sprite_visibility()
 
 	# Update trajectory preview
-	_update_trajectory(mouse_pos)
+	if not is_throwing:
+		_update_trajectory(mouse_pos)
 
 func _update_sprite_visibility() -> void:
 	# Three horizontal zones: left, center, right
@@ -267,6 +270,14 @@ func _start_throw_to(mouse_pos: Vector2) -> void:
 	# Store initial rotation for interpolation
 	var initial_rotation: float = proj.rotation
 	proj.set_meta("initial_rotation", initial_rotation)
+
+	# Hide the static dart sprites while the projectile is in flight
+	is_throwing = true
+	sprite_left.visible = false
+	sprite_center.visible = false
+	sprite_right.visible = false
+	trajectory_line.visible = false
+
 	var tween := create_tween()
 	var cb := Callable(self, "_update_projectile_along_bezier").bind(proj, p0, p1, p2, p3)
 	tween.tween_method(cb, 0.0, 1.0, projectile_duration)
@@ -279,6 +290,8 @@ func _start_throw_to(mouse_pos: Vector2) -> void:
 		print("Shot duration: %.3f seconds" % shot_duration)
 		# Signal that the dart has landed
 		GameState.land_dart()
+		# Show the static dart sprites again after landing
+		is_throwing = false
 	)
 
 func _update_projectile_along_bezier(t: float, proj: Node2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> void:

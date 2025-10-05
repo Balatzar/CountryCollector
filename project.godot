@@ -24,6 +24,7 @@ GameState="*res://GameState.gd"
 
 window/size/viewport_width=1800
 window/size/viewport_height=1200
+window/size/resizable=false
 window/vsync/vsync_mode=0
 
 [editor]
