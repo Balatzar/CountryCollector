@@ -14,6 +14,7 @@ extends Node2D
 
 # Trajectory preview configuration
 @export_group("Trajectory Preview")
+@export var show_preview := true
 @export var trajectory_color: Color = Color(1.0, 1.0, 1.0, 0.6)  ## Color of the trajectory line
 @export var trajectory_width: float = 3.0  ## Width of the trajectory line
 @export var trajectory_resolution: int = 30  ## Number of points in the curve (smoothness)
@@ -66,6 +67,7 @@ func _ready() -> void:
 	set_meta("cur_rot", 0.0)
 
 	# Configure trajectory line and ensure it renders above the dart
+	trajectory_line.visible = show_preview
 	trajectory_line.default_color = trajectory_color
 	trajectory_line.width = trajectory_width
 	trajectory_line.z_index = 100  # make sure line is always drawn on top
@@ -73,7 +75,7 @@ func _ready() -> void:
 	# Start with right sprite visible
 	_update_sprite_visibility()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	# Get mouse position
 	var mouse_pos = get_viewport().get_mouse_position()
 	var viewport_size = get_viewport_rect().size

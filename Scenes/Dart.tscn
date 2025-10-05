@@ -12,6 +12,7 @@ max_rotation_degrees = 10.0
 perspective_damping = 0.5
 bottom_offset = 10.0
 damping = 0.05
+show_preview = false
 trajectory_width = 5.0
 min_arch_factor = 1.0
 max_arch_factor = 1.5
