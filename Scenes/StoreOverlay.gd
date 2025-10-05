@@ -12,7 +12,8 @@ const CARD_SCENE := preload("res://Scenes/Card.tscn")
 
 # Node references
 @onready var dimmer: ColorRect = $Dimmer
-@onready var cards_container: HBoxContainer = $CenterContainer/CardsContainer
+@onready var level_up_label: Label = $CenterContainer/VBox/LevelUpLabel
+@onready var cards_container: HBoxContainer = $CenterContainer/VBox/CardsContainer
 
 # Card instances
 var card_instances: Array[Node] = []
@@ -34,7 +35,7 @@ var test_card_2: Dictionary = {
 func _ready() -> void:
 	# Initially hide the overlay
 	hide()
-	
+
 	# Setup dimmer click to close (optional)
 	dimmer.gui_input.connect(_on_dimmer_input)
 
@@ -74,7 +75,7 @@ func _clear_cards() -> void:
 		if is_instance_valid(card):
 			card.queue_free()
 	card_instances.clear()
-	
+
 	# Also clear any remaining children in container
 	for child in cards_container.get_children():
 		child.queue_free()
@@ -83,10 +84,10 @@ func _clear_cards() -> void:
 func _on_card_selected(card_data: Dictionary) -> void:
 	"""Handle card selection"""
 	print("[StoreOverlay] Card selected: ", card_data.name)
-	
+
 	# Emit signal
 	card_selected.emit(card_data)
-	
+
 	# Close the store
 	hide_store()
 
@@ -105,6 +106,7 @@ func _animate_entrance() -> void:
 	"""Animate the store entrance"""
 	# Start with dimmer transparent and cards scaled down
 	dimmer.modulate.a = 0.0
+	level_up_label.modulate.a = 0.0
 	card_instances[0].modulate.a = 0.0
 	card_instances[0].scale = Vector2(0.5, 0.5)
 	card_instances[1].modulate.a = 0.0
@@ -115,13 +117,19 @@ func _animate_entrance() -> void:
 	tween.set_parallel(true)
 	tween.tween_property(dimmer, "modulate:a", 1.0, 0.3)
 
+	# Animate LEVEL UP label - simple fade in
+	tween.tween_property(level_up_label, "modulate:a", 1.0, 0.3)
+
 	# Animate first card
-	tween.tween_property(card_instances[0], "modulate:a", 1.0, 0.4).set_delay(0.1)
-	tween.tween_property(card_instances[0], "scale", Vector2.ONE, 0.4).set_delay(0.1).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(card_instances[0], "modulate:a", 1.0, 0.4).set_delay(0.3)
+	tween.tween_property(card_instances[0], "scale", Vector2.ONE, 0.4).set_delay(0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 	# Animate second card
-	tween.tween_property(card_instances[1], "modulate:a", 1.0, 0.4).set_delay(0.2)
-	tween.tween_property(card_instances[1], "scale", Vector2.ONE, 0.4).set_delay(0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(card_instances[1], "modulate:a", 1.0, 0.4).set_delay(0.4)
+	tween.tween_property(card_instances[1], "scale", Vector2.ONE, 0.4).set_delay(0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	# Start subtle border animation
+	_animate_level_up_border()
 
 
 func _animate_exit() -> void:
@@ -131,6 +139,9 @@ func _animate_exit() -> void:
 
 	# Fade out dimmer
 	tween.tween_property(dimmer, "modulate:a", 0.0, 0.2)
+
+	# Fade out level up label
+	tween.tween_property(level_up_label, "modulate:a", 0.0, 0.2)
 
 	# Fade out and scale down first card
 	tween.tween_property(card_instances[0], "modulate:a", 0.0, 0.2)
@@ -145,3 +156,14 @@ func _animate_exit() -> void:
 		hide()
 		store_closed.emit()
 	).set_delay(0.2)
+
+
+
+func _animate_level_up_border() -> void:
+	"""Simple border color animation from orange to dark orange"""
+	var border_tween := create_tween()
+	border_tween.set_loops()
+
+	# Subtle outline color shift: orange to dark orange
+	border_tween.tween_property(level_up_label, "theme_override_colors/font_outline_color", Color(1.0, 0.5, 0.0, 1.0), 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	border_tween.tween_property(level_up_label, "theme_override_colors/font_outline_color", Color(0.6, 0.3, 0.0, 1.0), 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
