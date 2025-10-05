@@ -9,6 +9,11 @@ var scroll_speed: float  # Current scroll speed (base * multiplier)
 # Base scale for the globe display
 var base_globe_scale: Vector2 = Vector2.ONE
 
+# Vertical drift parameters
+var vertical_drift_amplitude: float = 0.0  # Amplitude of vertical oscillation (0 = disabled)
+var vertical_drift_time: float = 0.0  # Time accumulator for sine wave
+const VERTICAL_DRIFT_FREQUENCY: float = 0.5  # Oscillations per second (higher = faster)
+
 ## Node references
 @onready var sub_viewport: SubViewport = $SubViewport
 @onready var world_scroller: Node2D = $SubViewport/WorldScroller
@@ -85,10 +90,12 @@ func _ready() -> void:
 	GameState.country_collected.connect(_on_country_collected)
 	GameState.rotation_speed_changed.connect(_on_rotation_speed_changed)
 	GameState.globe_scale_changed.connect(_on_globe_scale_changed)
+	GameState.vertical_drift_changed.connect(_on_vertical_drift_changed)
 
-	# Initialize scroll speed and globe scale with current multipliers
+	# Initialize scroll speed, globe scale, and vertical drift with current values
 	_update_scroll_speed()
 	_update_globe_scale()
+	_update_vertical_drift()
 
 func start_rotation() -> void:
 	"""Called externally when loading is complete and it's safe to copy sprites"""
@@ -238,11 +245,25 @@ func _process(delta: float) -> void:
 	# Wrap offset to stay within one map width
 	scroll_offset = fmod(scroll_offset, map_width)
 
+	# Update vertical drift time
+	if vertical_drift_amplitude > 0.0:
+		vertical_drift_time += delta
+
 	# Move the scroller left to simulate rotation
 	# Account for the scale and maintain the centering
 	var scaled_width = map_width * world_scroller.scale.x
+	var scaled_height = 512.0 * world_scroller.scale.y
 	var base_x = (1024 - scaled_width) / 2.0
+	var base_y = (1024 - scaled_height) / 2.0
+
 	world_scroller.position.x = base_x - (scroll_offset * world_scroller.scale.x)
+
+	# Apply vertical drift using sine wave
+	if vertical_drift_amplitude > 0.0:
+		var drift_offset = sin(vertical_drift_time * VERTICAL_DRIFT_FREQUENCY * TAU) * vertical_drift_amplitude
+		world_scroller.position.y = base_y + drift_offset
+	else:
+		world_scroller.position.y = base_y
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -283,6 +304,11 @@ func _on_globe_scale_changed(_multiplier: float) -> void:
 	_update_globe_scale()
 
 
+func _on_vertical_drift_changed(_amplitude: float) -> void:
+	"""Handle vertical drift changes from GameState"""
+	_update_vertical_drift()
+
+
 func _update_scroll_speed() -> void:
 	"""Update scroll speed based on current multiplier from GameState"""
 	var multiplier = GameState.get_rotation_speed_multiplier()
@@ -304,3 +330,9 @@ func _update_globe_scale() -> void:
 	# Calculate new center position and adjust to keep globe centered
 	var center_after = globe_display.position + globe_rect.size * new_scale / 2.0
 	globe_display.position += center_before - center_after
+
+
+func _update_vertical_drift() -> void:
+	"""Update vertical drift amplitude based on current value from GameState"""
+	vertical_drift_amplitude = GameState.get_vertical_drift_amplitude()
+	print("[RotatingMap] Vertical drift amplitude updated to: ", vertical_drift_amplitude)

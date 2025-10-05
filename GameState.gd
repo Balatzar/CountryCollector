@@ -19,6 +19,7 @@ signal level_up(new_level: int)
 signal rotation_speed_changed(multiplier: float)
 signal globe_scale_changed(multiplier: float)
 signal zoom_bonus_acquired(zoom_level: int)
+signal vertical_drift_changed(amplitude: float)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -46,6 +47,9 @@ var acquired_cards: Array[Dictionary] = []
 var current_zoom_level: int = 0  # Net zoom level: positive = zoom bonus, negative = unzoom malus, 0 = neutral
 var zoom_bonus_tier: int = 0  # Track highest zoom bonus tier acquired (0-3)
 var unzoom_malus_tier: int = 0  # Track highest unzoom malus tier acquired (0-3)
+
+# Vertical drift tracking
+var vertical_drift_tier: int = 0  # Track highest vertical movement malus tier (0-3)
 
 # Loading state
 var loading_in_progress: bool = false
@@ -230,6 +234,19 @@ func acquire_card(card_data: Dictionary) -> void:
 		var new_multiplier = get_rotation_speed_multiplier()
 		rotation_speed_changed.emit(new_multiplier)
 		print("[GameState] Rotation speed multiplier updated: ", new_multiplier)
+	elif card_id.begins_with("vertical_movement_"):
+		# Update vertical drift tier
+		if card_id == "vertical_movement_t1":
+			vertical_drift_tier = 1
+		elif card_id == "vertical_movement_t2":
+			vertical_drift_tier = 2
+		elif card_id == "vertical_movement_t3":
+			vertical_drift_tier = 3
+
+		# Emit signal with new drift amplitude
+		var amplitude = get_vertical_drift_amplitude()
+		vertical_drift_changed.emit(amplitude)
+		print("[GameState] Vertical drift amplitude updated: ", amplitude)
 	elif card_id.begins_with("unzoom_"):
 		# Update unzoom malus tier
 		if card_id == "unzoom_t1":
@@ -318,6 +335,19 @@ func get_globe_scale_multiplier() -> float:
 			multiplier *= 0.85  # 15% reduction (equivalent to Unzoom I)
 
 	return multiplier
+
+
+# Get the current vertical drift amplitude based on acquired maluses
+func get_vertical_drift_amplitude() -> float:
+	match vertical_drift_tier:
+		1:
+			return 30.0  # ±30px
+		2:
+			return 60.0  # ±60px
+		3:
+			return 100.0  # ±100px
+		_:
+			return 0.0  # No drift
 
 
 # Update the net zoom level based on zoom bonus and unzoom malus tiers
