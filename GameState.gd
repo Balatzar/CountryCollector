@@ -5,6 +5,8 @@ signal countries_loaded()
 signal country_collected(country_id: String)
 signal dart_thrown()
 signal darts_changed(remaining_darts: int)
+signal loading_started(total: int)
+signal country_loading_progress(loaded: int, total: int)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -18,6 +20,10 @@ var country_colors: Dictionary = {}
 # Dart tracking
 const MAX_DARTS: int = 10
 var remaining_darts: int = MAX_DARTS
+# Loading state
+var loading_in_progress: bool = false
+var countries_loaded_count: int = 0
+var countries_total_count: int = 0
 
 
 func _ready() -> void:
@@ -74,8 +80,27 @@ func collect_country(country_id: String) -> void:
 		country_collected.emit(country_id)
 
 
-# Notify that all countries have been loaded
-func notify_countries_loaded() -> void:
+# Start loading countries
+func start_loading(total: int) -> void:
+	print("[GameState] start_loading: ", total)
+	loading_in_progress = true
+	countries_loaded_count = 0
+	countries_total_count = total
+	loading_started.emit(total)
+
+
+# Update loading progress
+func update_loading_progress(loaded: int) -> void:
+	countries_loaded_count = loaded
+	country_loading_progress.emit(loaded, countries_total_count)
+
+
+# Finish loading and notify completion
+func finish_loading() -> void:
+	print("[GameState] finish_loading")
+	loading_in_progress = false
+	countries_loaded_count = 0
+	countries_total_count = 0
 	countries_loaded.emit()
 
 

@@ -1,0 +1,12 @@
+[gd_scene load_steps=4 format=3 uid="uid://vpm14equhjq1"]
+
+[ext_resource type="PackedScene" uid="uid://ftxto3hrxyid" path="res://Scenes/CountryProgressBar.tscn" id="1_bk6rr"]
+[ext_resource type="Script" uid="uid://d38j6ru23dce8" path="res://Scenes/globe_and_dart_with_progress.gd" id="1_o2ylp"]
+[ext_resource type="PackedScene" uid="uid://38db2sx7uvuv" path="res://Scenes/GlobeWithDart.tscn" id="2_o2ylp"]
+
+[node name="GlobeAndDartWithProgress" type="Node2D"]
+script = ExtResource("1_o2ylp")
+
+[node name="GlobeWithDart" parent="." instance=ExtResource("2_o2ylp")]
+
+[node name="CountryProgressBar" parent="." instance=ExtResource("1_bk6rr")]

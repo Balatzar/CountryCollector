@@ -62,12 +62,27 @@ func _load_countries():
 
 	print("[StaticMap] Found ", country_list.size(), " countries")
 
+	# Start loading and notify GameState
+	var total = country_list.size()
+	GameState.start_loading(total)
+
+	# Load countries in batches to show progress
+	var i := 0
 	for country_id in country_list:
 		_create_country_sprite(country_id)
+		i += 1
+
+		# Update progress
+		GameState.update_loading_progress(i)
+
+		# Yield every 5 countries to update UI
+		if i % 5 == 0:
+			await get_tree().process_frame
 
 	print("[StaticMap] Created ", get_child_count(), " sprites")
+
 	# Notify that all countries have been loaded
-	GameState.notify_countries_loaded()
+	GameState.finish_loading()
 
 func _create_country_sprite(country_id: String):
 	var alpha_path = ASSETS_DIR + country_id + ".png"
