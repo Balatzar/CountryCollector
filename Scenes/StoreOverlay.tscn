@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://store_overlay_001"]
+[gd_scene load_steps=2 format=3 uid="uid://cc2bky04q0r5b"]
 
-[ext_resource type="Script" path="res://Scenes/StoreOverlay.gd" id="1_store_script"]
+[ext_resource type="Script" uid="uid://c1b42er8wcrry" path="res://Scenes/StoreOverlay.gd" id="1_store_script"]
 
 [node name="StoreOverlay" type="CanvasLayer"]
 script = ExtResource("1_store_script")
@@ -22,8 +22,29 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="CardsContainer" type="HBoxContainer" parent="CenterContainer"]
+[node name="VBox" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="LevelUpLabel" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_colors/font_outline_color = Color(1, 0.5, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 80
+text = "LEVEL UP!"
+horizontal_alignment = 1
+
+[node name="LevelUpLabel2" type="Label" parent="CenterContainer/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 1)
+theme_override_colors/font_outline_color = Color(1, 0.5, 0, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 50
+text = "Choose... wisely"
+horizontal_alignment = 1
+
+[node name="CardsContainer" type="HBoxContainer" parent="CenterContainer/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 40
 alignment = 1
-
