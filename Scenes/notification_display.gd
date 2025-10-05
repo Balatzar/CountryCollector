@@ -2,12 +2,12 @@ extends Node2D
 
 ## Animation settings
 @export_group("Animation Timing")
-@export var animation_duration: float = 1.2
-@export var fade_start_time: float = 0.6  # When to start fading (0.0 = immediately, 1.0 = at end)
+@export var animation_duration: float = 1.8
+@export var fade_start_time: float = 0.75  # When to start fading (0.0 = immediately, 1.0 = at end)
 
 @export_group("Movement")
 @export var base_move_distance: Vector2 = Vector2(0, -150)  # Base upward movement
-@export var horizontal_spread: float = 200.0  # Random horizontal variance
+@export var horizontal_spread: float = 350.0  # Random horizontal variance
 @export var vertical_variance: float = 80.0  # Random vertical variance
 
 @export_group("Rotation & Scale")

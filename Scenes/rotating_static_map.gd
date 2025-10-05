@@ -26,6 +26,7 @@ const COLOR_HIT = Color.LIGHT_GREEN
 const COLOR_MISS = Color.ORANGE
 const COLOR_COUNTRY = Color.CYAN
 const COLOR_FUN = Color.YELLOW
+const COLOR_XP = Color.GOLD
 
 # Fun notification messages
 const FUN_SUCCESS_MESSAGES = [
@@ -122,6 +123,11 @@ func _on_country_collected(country_id: String) -> void:
 	var country_size := CountryNames.get_country_size(country_id)
 	var size_text := _get_size_text(country_size)
 	GameState.show_notification("You hit a " + size_text + " country!", GameState.last_dart_position, COLOR_COUNTRY)
+
+	# Wait another 100ms before showing XP reward
+	await get_tree().create_timer(0.1).timeout
+	var xp_reward := GameState.get_xp_reward_for_country(country_id)
+	GameState.show_notification("+" + str(xp_reward) + " XP", GameState.last_dart_position, COLOR_XP)
 
 	# Wait another 100ms before showing fun success message
 	await get_tree().create_timer(0.1).timeout

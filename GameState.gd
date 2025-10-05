@@ -1,5 +1,7 @@
 extends Node
 
+const CountryNames = preload("res://CountryNames.gd")
+
 # Signals
 signal countries_loaded()
 signal country_collected(country_id: String)
@@ -45,6 +47,15 @@ var countries_total_count: int = 0
 const XP_PER_LEVEL: int = 100
 var xp: int = 0
 var level: int = 1
+
+# XP rewards based on country size
+const XP_REWARDS = {
+	CountryNames.Size.MICROSCOPIC: 300,
+	CountryNames.Size.SMALL: 150,
+	CountryNames.Size.MEDIUM: 100,
+	CountryNames.Size.BIG: 60,
+	CountryNames.Size.HUGE: 40
+}
 
 
 func _ready() -> void:
@@ -98,6 +109,12 @@ func _colors_match(c1: Color, c2: Color, tolerance: float) -> bool:
 func collect_country(country_id: String) -> void:
 	if country_id not in collected_countries:
 		collected_countries.append(country_id)
+
+		# Award XP based on country size
+		var country_size = CountryNames.get_country_size(country_id)
+		var xp_reward = XP_REWARDS.get(country_size, 100)
+		add_xp(xp_reward)
+
 		country_collected.emit(country_id)
 
 
@@ -205,6 +222,12 @@ func has_card(card_name: String) -> bool:
 # Get all acquired cards
 func get_acquired_cards() -> Array[Dictionary]:
 	return acquired_cards.duplicate()
+
+
+# Get XP reward for a country based on its size
+func get_xp_reward_for_country(country_id: String) -> int:
+	var country_size = CountryNames.get_country_size(country_id)
+	return XP_REWARDS.get(country_size, 100)
 
 
 # Add experience points and handle level ups
