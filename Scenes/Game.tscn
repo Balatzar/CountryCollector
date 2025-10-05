@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bf4tw7lmwlwuj"]
+[gd_scene load_steps=6 format=3 uid="uid://bf4tw7lmwlwuj"]
 
 [ext_resource type="PackedScene" uid="uid://vpm14equhjq1" path="res://Scenes/GlobeAndDartWithProgress.tscn" id="1_gl6un"]
 [ext_resource type="Script" uid="uid://bheof2fagiofc" path="res://Scenes/Game.gd" id="1_kldst"]
 [ext_resource type="PackedScene" uid="uid://dkm8y5qvxh3yw" path="res://Scenes/GameOverlay.tscn" id="2_j5yw3"]
 [ext_resource type="PackedScene" uid="uid://bk3qxoc3yvyp2" path="res://Scenes/NotificationDisplay.tscn" id="4_b2bpf"]
+[ext_resource type="PackedScene" path="res://Scenes/StoreOverlay.tscn" id="5_b2bpf"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_kldst")
@@ -14,3 +15,6 @@ script = ExtResource("1_kldst")
 
 [node name="NotificationDisplay" parent="." instance=ExtResource("4_b2bpf")]
 position = Vector2(892, 660)
+
+[node name="StoreOverlay" parent="." instance=ExtResource("5_b2bpf")]
+process_mode = 3
