@@ -337,11 +337,11 @@ func get_globe_scale_multiplier() -> float:
 func get_vertical_drift_amplitude() -> float:
 	match vertical_drift_tier:
 		1:
-			return 30.0  # ±30px
+			return 20.0  # ±20px
 		2:
-			return 60.0  # ±60px
+			return 40.0  # ±40px
 		3:
-			return 100.0  # ±100px
+			return 60.0  # ±60px
 		_:
 			return 0.0  # No drift
 
@@ -391,10 +391,10 @@ func add_xp(amount: int) -> void:
 		xp -= XP_PER_LEVEL
 		level += 1
 
-		# Award 5 darts on every level up
-		remaining_darts += 5
+		# Award 3 darts on every level up
+		remaining_darts += 3
 		darts_changed.emit(remaining_darts)
-		print("[GameState] Level up! New level: ", level, " - Awarded 5 darts, new count: ", remaining_darts)
+		print("[GameState] Level up! New level: ", level, " - Awarded 3 darts, new count: ", remaining_darts)
 
 		level_up.emit(level)
 
