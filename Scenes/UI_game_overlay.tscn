@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cae23cgmqqrgu"]
+[gd_scene load_steps=0 format=3 uid="uid://cae23cgmqqrgu"]
 
 [node name="OverlayUI" type="Node2D"]
 

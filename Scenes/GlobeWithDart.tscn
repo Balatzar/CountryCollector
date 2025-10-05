@@ -1,13 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://csoo31xa8mtu8"]
+[gd_scene load_steps=3 format=3 uid="uid://csoo31xa8mtu8"]
 
 [ext_resource type="PackedScene" uid="uid://cr7n2oqojw87i" path="res://Scenes/Dart.tscn" id="1_20om3"]
 [ext_resource type="PackedScene" uid="uid://bolaoptqar2l" path="res://Scenes/RotatingStaticMap.tscn" id="2_ia80w"]
-[ext_resource type="PackedScene" path="res://Scenes/GameOverlay.tscn" id="3_ia80w"]
 
 [node name="GlobeWithDart" type="Node2D"]
 
 [node name="RotatingStaticMap" parent="." instance=ExtResource("2_ia80w")]
 
 [node name="Dart" parent="." instance=ExtResource("1_20om3")]
-
-[node name="GameOverlay" parent="." instance=ExtResource("3_ia80w")]
