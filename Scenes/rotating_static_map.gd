@@ -33,12 +33,30 @@ func _ready() -> void:
 	# Set the viewport texture on the globe display
 	globe_display.texture = sub_viewport.get_texture()
 
+	# Connect to country collection signal to rebuild copies
+	GameState.country_collected.connect(_on_country_collected)
+
+	# Connect to dart landed signal to collect pending country
+	GameState.dart_landed.connect(_on_dart_landed)
+
 func start_rotation() -> void:
 	"""Called externally when loading is complete and it's safe to copy sprites"""
 	if not copies_created:
 		_create_map_copy()
 	is_paused = false
 	print("[RotatingMap] Rotation started")
+
+func _on_country_collected(_country_id: String) -> void:
+	# Rebuild map copies to reflect the new white color
+	if copies_created and map_copy != null:
+		_rebuild_map_copy()
+
+
+func _on_dart_landed() -> void:
+	# Collect the pending country when dart lands
+	if GameState.pending_country != "":
+		GameState.collect_country(GameState.pending_country)
+		GameState.pending_country = ""
 
 func _create_map_copy() -> void:
 	if copies_created:
@@ -72,6 +90,33 @@ func _create_map_copy() -> void:
 
 	print("[RotatingMap] Created ", sprite_count, " sprite copies")
 	copies_created = true
+
+func _rebuild_map_copy() -> void:
+	"""Rebuild the map copy to reflect updated textures (e.g., collected countries)"""
+	if map_copy == null:
+		return
+
+	# Remove all existing copied sprites
+	for child in map_copy.get_children():
+		child.queue_free()
+
+	# Recreate them with current textures
+	var sprite_count = 0
+	for child in static_map.get_children():
+		if child is Sprite2D:
+			if child.texture == null:
+				continue
+			var sprite_copy = Sprite2D.new()
+			sprite_copy.texture = child.texture
+			sprite_copy.centered = child.centered
+			sprite_copy.position = child.position
+			sprite_copy.scale = child.scale
+			sprite_copy.rotation = child.rotation
+			sprite_copy.modulate = child.modulate
+			map_copy.add_child(sprite_copy)
+			sprite_count += 1
+
+	print("[RotatingMap] Rebuilt ", sprite_count, " sprite copies")
 
 func _process(delta: float) -> void:
 	# Don't update if paused
@@ -114,6 +159,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 					if country_id != "":
 							print("Clicked country: ", country_id)
-							GameState.collect_country(country_id)
+							GameState.set_pending_country(country_id)
 					else:
 							print("No country found at color: ", color)
