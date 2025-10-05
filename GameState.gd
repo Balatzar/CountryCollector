@@ -225,11 +225,7 @@ func acquire_card(card_data: Dictionary) -> void:
 
 	# Apply immediate effects based on card ID
 	var card_id = card_data.get("id", "")
-	if card_id == "extra_shots":
-		remaining_darts += 5
-		darts_changed.emit(remaining_darts)
-		print("[GameState] Added 5 darts, new count: ", remaining_darts)
-	elif card_id.begins_with("slower_map_") or card_id.begins_with("faster_map_"):
+	if card_id.begins_with("slower_map_") or card_id.begins_with("faster_map_"):
 		# Update rotation speed when speed-affecting cards are acquired
 		var new_multiplier = get_rotation_speed_multiplier()
 		rotation_speed_changed.emit(new_multiplier)
@@ -394,8 +390,13 @@ func add_xp(amount: int) -> void:
 	while xp >= XP_PER_LEVEL:
 		xp -= XP_PER_LEVEL
 		level += 1
+
+		# Award 5 darts on every level up
+		remaining_darts += 5
+		darts_changed.emit(remaining_darts)
+		print("[GameState] Level up! New level: ", level, " - Awarded 5 darts, new count: ", remaining_darts)
+
 		level_up.emit(level)
-		print("[GameState] Level up! New level: ", level)
 
 	# Emit XP change signal
 	xp_changed.emit(xp, level)

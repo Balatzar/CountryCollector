@@ -38,15 +38,6 @@ const BONUS_SLOWER_MAP_T3 = {
 	"repeatable": false
 }
 
-const BONUS_EXTRA_SHOTS = {
-	"id": "extra_shots",
-	"type": PowerUpType.BONUS,
-	"name": "+5 Shots",
-	"description": "Gain 5 additional darts",
-	"tier": 0,
-	"repeatable": true
-}
-
 const BONUS_ZOOM_T1 = {
 	"id": "zoom_t1",
 	"type": PowerUpType.BONUS,
@@ -164,7 +155,6 @@ const ALL_BONUSES = [
 	BONUS_SLOWER_MAP_T1,
 	BONUS_SLOWER_MAP_T2,
 	BONUS_SLOWER_MAP_T3,
-	BONUS_EXTRA_SHOTS,
 	BONUS_ZOOM_T1,
 	BONUS_ZOOM_T2,
 	BONUS_ZOOM_T3

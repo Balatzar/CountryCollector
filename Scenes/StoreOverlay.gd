@@ -14,6 +14,7 @@ const CARD_SCENE := preload("res://Scenes/Card.tscn")
 @onready var dimmer: ColorRect = $Dimmer
 @onready var level_up_label: Label = $CenterContainer/VBox/LevelUpLabel
 @onready var cards_container: HBoxContainer = $CenterContainer/VBox/CardsContainer
+@onready var darts_reward_label: Label = $CenterContainer/VBox/DartsRewardLabel
 
 # Card instances
 var card_instances: Array[Node] = []
@@ -136,6 +137,8 @@ func _animate_entrance() -> void:
 	# Start with dimmer transparent and cards scaled down
 	dimmer.modulate.a = 0.0
 	level_up_label.modulate.a = 0.0
+	darts_reward_label.modulate.a = 0.0
+	darts_reward_label.scale = Vector2(0.5, 0.5)
 	card_instances[0].modulate.a = 0.0
 	card_instances[0].scale = Vector2(0.5, 0.5)
 	card_instances[1].modulate.a = 0.0
@@ -157,6 +160,10 @@ func _animate_entrance() -> void:
 	tween.tween_property(card_instances[1], "modulate:a", 1.0, 0.4).set_delay(0.4)
 	tween.tween_property(card_instances[1], "scale", Vector2.ONE, 0.4).set_delay(0.4).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
+	# Animate darts reward label
+	tween.tween_property(darts_reward_label, "modulate:a", 1.0, 0.4).set_delay(0.5)
+	tween.tween_property(darts_reward_label, "scale", Vector2.ONE, 0.4).set_delay(0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
 	# Start subtle border animation
 	_animate_level_up_border()
 
@@ -171,6 +178,10 @@ func _animate_exit() -> void:
 
 	# Fade out level up label
 	tween.tween_property(level_up_label, "modulate:a", 0.0, 0.2)
+
+	# Fade out darts reward label
+	tween.tween_property(darts_reward_label, "modulate:a", 0.0, 0.2)
+	tween.tween_property(darts_reward_label, "scale", Vector2(0.8, 0.8), 0.2)
 
 	# Fade out and scale down first card
 	tween.tween_property(card_instances[0], "modulate:a", 0.0, 0.2)
