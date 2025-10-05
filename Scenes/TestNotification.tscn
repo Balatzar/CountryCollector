@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://bcrf74xrj0xym"]
+
+[ext_resource type="PackedScene" uid="uid://bk3qxoc3yvyp2" path="res://Scenes/NotificationDisplay.tscn" id="1_5wr5a"]
+[ext_resource type="Script" uid="uid://cgicnaduhbyry" path="res://Scenes/test_notification.gd" id="1_v6m24"]
+
+[node name="TestNotification" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_v6m24")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 929.0
+offset_top = 609.0
+offset_right = 983.0
+offset_bottom = 640.0
+text = "Test ! "
+
+[node name="NotificationDisplay" parent="." instance=ExtResource("1_5wr5a")]
+position = Vector2(938, 529)

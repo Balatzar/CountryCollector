@@ -282,14 +282,16 @@ func _start_throw_to(mouse_pos: Vector2) -> void:
 	var cb := Callable(self, "_update_projectile_along_bezier").bind(proj, p0, p1, p2, p3)
 	tween.tween_method(cb, 0.0, 1.0, projectile_duration)
 	tween.finished.connect(func():
+		var landing_pos := Vector2.ZERO
 		if is_instance_valid(proj):
+			landing_pos = proj.global_position
 			proj.queue_free()
 		# Print shot duration
 		var shot_end_time: float = Time.get_ticks_msec() / 1000.0
 		var shot_duration: float = shot_end_time - shot_start_time
 		print("Shot duration: %.3f seconds" % shot_duration)
-		# Signal that the dart has landed
-		GameState.land_dart()
+		# Signal that the dart has landed with position
+		GameState.land_dart(landing_pos)
 		# Show the static dart sprites again after landing
 		is_throwing = false
 	)

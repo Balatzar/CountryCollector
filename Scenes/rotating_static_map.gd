@@ -1,5 +1,7 @@
 extends Node2D
 
+const CountryNames = preload("res://CountryNames.gd")
+
 ## Configuration
 @export var scroll_speed: float = 50.0  # Pixels per second
 
@@ -15,6 +17,14 @@ var map_width: float = 1024.0  # Width of the PNG images
 var map_copy: Node2D = null
 var copies_created: bool = false
 var is_paused: bool = true  # Start paused until loading is complete
+
+# Track if current dart hit a country (reset on each throw)
+var dart_hit_country: bool = false
+
+# Notification colors
+const COLOR_HIT = Color.LIGHT_GREEN
+const COLOR_MISS = Color.ORANGE
+const COLOR_COUNTRY = Color.CYAN
 
 func _ready() -> void:
 	# Scale the map to fit better in the globe (maps are 1024x512)
@@ -33,11 +43,10 @@ func _ready() -> void:
 	# Set the viewport texture on the globe display
 	globe_display.texture = sub_viewport.get_texture()
 
-	# Connect to country collection signal to rebuild copies
-	GameState.country_collected.connect(_on_country_collected)
-
-	# Connect to dart landed signal to collect pending country
+	# Connect to game signals
+	GameState.dart_thrown.connect(_on_dart_thrown)
 	GameState.dart_landed.connect(_on_dart_landed)
+	GameState.country_collected.connect(_on_country_collected)
 
 func start_rotation() -> void:
 	"""Called externally when loading is complete and it's safe to copy sprites"""
@@ -46,10 +55,9 @@ func start_rotation() -> void:
 	is_paused = false
 	print("[RotatingMap] Rotation started")
 
-func _on_country_collected(_country_id: String) -> void:
-	# Rebuild map copies to reflect the new white color
-	if copies_created and map_copy != null:
-		_rebuild_map_copy()
+func _on_dart_thrown() -> void:
+	# Reset hit tracking for new dart
+	dart_hit_country = false
 
 
 func _on_dart_landed() -> void:
@@ -57,6 +65,29 @@ func _on_dart_landed() -> void:
 	if GameState.pending_country != "":
 		GameState.collect_country(GameState.pending_country)
 		GameState.pending_country = ""
+	else:
+		# Show miss notification if we didn't hit a country
+		if not dart_hit_country:
+			GameState.show_notification("Miss!", GameState.last_dart_position, COLOR_MISS)
+
+
+func _on_country_collected(country_id: String) -> void:
+	# Mark that this dart hit a country
+	dart_hit_country = true
+
+	# Show hit notification at dart landing position
+	GameState.show_notification("Hit!", GameState.last_dart_position, COLOR_HIT)
+
+	# Wait 100ms before showing country name
+	await get_tree().create_timer(0.1).timeout
+
+	# Get the country name and show it
+	var country_name := CountryNames.get_country_name(country_id)
+	GameState.show_notification(country_name, GameState.last_dart_position, COLOR_COUNTRY)
+
+	# Rebuild map copies to reflect the new white color
+	if copies_created and map_copy != null:
+		_rebuild_map_copy()
 
 func _create_map_copy() -> void:
 	if copies_created:

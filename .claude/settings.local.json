@@ -14,7 +14,10 @@
       "WebSearch",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script CountryNames.gd)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/OverlayUI.gd)",
-      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GameOverlay.gd)"
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GameOverlay.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/notification_display.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/test_notification.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/Game.gd)"
     ],
     "deny": [],
     "ask": []

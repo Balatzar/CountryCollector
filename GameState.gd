@@ -10,6 +10,7 @@ signal loading_started(total: int)
 signal country_loading_progress(loaded: int, total: int)
 signal store_opened()
 signal card_acquired(card_data: Dictionary)
+signal notification_requested(text: String, position: Vector2, color: Color)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -22,6 +23,9 @@ var country_colors: Dictionary = {}
 
 # Pending country from click (will be collected when dart lands)
 var pending_country: String = ""
+
+# Last dart landing position (for notifications)
+var last_dart_position: Vector2 = Vector2.ZERO
 
 # Dart tracking
 const MAX_DARTS: int = 10
@@ -120,8 +124,14 @@ func set_pending_country(country_id: String) -> void:
 
 
 # Signal that the dart has landed
-func land_dart() -> void:
+func land_dart(position: Vector2 = Vector2.ZERO) -> void:
+	last_dart_position = position
 	dart_landed.emit()
+
+
+# Request a notification to be displayed at a specific position
+func show_notification(text: String, position: Vector2, color: Color = Color.WHITE) -> void:
+	notification_requested.emit(text, position, color)
 
 
 # Check if a country has been collected
