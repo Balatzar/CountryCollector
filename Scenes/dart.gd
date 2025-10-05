@@ -29,6 +29,10 @@ extends Node2D
 @export var tip_offset_center: Vector2 = Vector2(0, -300)
 @export var tip_offset_right: Vector2 = Vector2(0, -300)
 
+# Projectile animation configuration
+@export_group("Projectile Animation")
+@export var projectile_rotation_factor: float = 0.2  ## How much the projectile rotates toward the curve tangent (0=none, 1=full)
+
 # Sprite references
 @onready var sprite_left: Sprite2D = $SpriteLeft
 @onready var sprite_center: Sprite2D = $SpriteCenter
@@ -61,9 +65,10 @@ func _ready() -> void:
 	set_meta("cur_skew", 0.0)
 	set_meta("cur_rot", 0.0)
 
-	# Configure trajectory line
+	# Configure trajectory line and ensure it renders above the dart
 	trajectory_line.default_color = trajectory_color
 	trajectory_line.width = trajectory_width
+	trajectory_line.z_index = 100  # make sure line is always drawn on top
 
 	# Start with right sprite visible
 	_update_sprite_visibility()
@@ -93,7 +98,7 @@ func _process(delta: float) -> void:
 	var width: float = viewport_size.x
 	var left_bound: float = 0.45 * width
 	var right_bound: float = 0.55 * width
-	var is_left: bool = current_x < left_bound
+	var _is_left: bool = current_x < left_bound
 	var is_center: bool = current_x >= left_bound and current_x < right_bound
 	var is_right: bool = current_x >= right_bound
 	# Base rotation from vertical position
@@ -226,5 +231,136 @@ func _update_trajectory(mouse_pos: Vector2) -> void:
 	# Update the Line2D
 	trajectory_line.points = local_points
 
+
+# --- Throw animation along current Bézier preview ---
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_start_throw_to((event as InputEventMouseButton).position)
+
+func _start_throw_to(mouse_pos: Vector2) -> void:
+	var start_tip: Vector2 = _get_dart_tip_position()
+	var controls := _compute_bezier_controls(start_tip, mouse_pos)
+	var p0: Vector2 = controls[0]
+	var p1: Vector2 = controls[1]
+	var p2: Vector2 = controls[2]
+	var p3: Vector2 = controls[3]
+	var proj: Node2D = _make_projectile_sprite()
+	add_child(proj)
+	proj.global_position = start_tip
+	# Store initial rotation for interpolation
+	var initial_rotation: float = proj.rotation
+	proj.set_meta("initial_rotation", initial_rotation)
+	var distance: float = start_tip.distance_to(mouse_pos)
+	var duration: float = clamp(distance / 1400.0, 0.25, 0.9)
+	var tween := create_tween()
+	var cb := Callable(self, "_update_projectile_along_bezier").bind(proj, p0, p1, p2, p3)
+	tween.tween_method(cb, 0.0, 1.0, duration)
+	tween.finished.connect(func():
+		if is_instance_valid(proj):
+			proj.queue_free()
+	)
+
+func _update_projectile_along_bezier(t: float, proj: Node2D, p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> void:
+	var omt := 1.0 - t
+	var omt2 := omt * omt
+	var t2 := t * t
+	var pos: Vector2 = (
+		omt2 * omt * p0 +
+		3.0 * omt2 * t * p1 +
+		3.0 * omt * t2 * p2 +
+		t2 * t * p3
+	)
+	proj.global_position = pos
+	var s: float = lerp(1.0, 0.5, t)
+	proj.scale = Vector2(s, s)
+	# Orientation-aware rotation
+	var sprite_orientation: String = str(proj.get_meta("sprite_orientation", "right"))
+	# Disable rotation for center projectile
+	if sprite_orientation == "center":
+		return
+	# Tangent (derivative) for rotation
+	var tangent: Vector2 = (
+		3.0 * omt2 * (p1 - p0) +
+		6.0 * omt * t * (p2 - p1) +
+		3.0 * t2 * (p3 - p2)
+	)
+	var tangent_angle: float = atan2(tangent.y, tangent.x)
+	# Align tip to tangent using art's precomputed forward direction in world (without parent)
+	var forward_world_no_parent: float = float(proj.get_meta("forward_world_no_parent", 0.0))
+	var desired_parent_rot: float = tangent_angle - forward_world_no_parent
+	proj.rotation = lerp_angle(proj.rotation, desired_parent_rot, projectile_rotation_factor)
+
+
+func _make_projectile_sprite() -> Node2D:
+	var source: Sprite2D = sprite_left if sprite_left.visible else (sprite_center if sprite_center.visible else sprite_right)
+	var proj := Node2D.new()
+	var dup := source.duplicate() as Sprite2D
+	proj.add_child(dup)
+	# Get the tip position in the source sprite's local space
+	var tip_local: Vector2
+	var tip_anchor: Node2D = dup.get_node_or_null("TipAnchor")
+	if tip_anchor:
+		# TipAnchor position is in sprite's local space
+		tip_local = tip_anchor.position
+	else:
+		# Fallback to configured offsets
+		if source == sprite_left:
+			tip_local = tip_offset_left
+		elif source == sprite_center:
+			tip_local = tip_offset_center
+		else:
+			tip_local = tip_offset_right
+
+	# Store which sprite orientation is being used for rotation logic
+	var sprite_orientation: String = ""
+	if source == sprite_left:
+		sprite_orientation = "left"
+	elif source == sprite_center:
+		sprite_orientation = "center"
+	else:
+		sprite_orientation = "right"
+	proj.set_meta("sprite_orientation", sprite_orientation)
+
+	# Apply 180° rotation for right dart around the tip anchor
+	if sprite_orientation == "right":
+		# Rotate the sprite 180° around the tip point
+		dup.rotation = PI
+		# After rotation, the tip position changes due to the rotation
+		# We need to recalculate where the tip is now
+		var tip_in_parent: Vector2 = dup.transform * tip_local
+		# Offset the duplicated sprite so the tip is at the projectile's origin
+		dup.position -= tip_in_parent
+	else:
+		# For center and left, normal behavior
+		# Transform the tip position through the sprite's transform to get it in the duplicated sprite's parent space
+		var tip_in_parent: Vector2 = dup.transform * tip_local
+		# Offset the duplicated sprite so the tip is at the projectile's origin
+		dup.position -= tip_in_parent
+
+	# Store child base rotation so parent can align to tangent relative to art
+	proj.set_meta("child_base_rotation", dup.rotation)
+
+	return proj
+
+func _compute_bezier_controls(start: Vector2, end: Vector2) -> Array[Vector2]:
+	var direction: Vector2 = (end - start)
+	var distance: float = max(0.001, direction.length())
+	var dir: Vector2 = direction / distance
+	var vertical_factor: float = -dir.y
+	var normalized_factor: float = clamp(vertical_factor, -1.0, 1.0)
+	var arch_amount: float = lerp(min_arch_factor, max_arch_factor, (normalized_factor + 1.0) / 2.0)
+	var n: Vector2 = Vector2(-dir.y, dir.x)
+	if n.y > 0.0:
+		n = -n
+	var base_len: float = distance * arch_amount
+	var len_start: float = base_len * max(0.0, start_handle_strength)
+	var len_end: float = base_len * max(0.0, end_handle_strength)
+	var f_start: float = distance * start_forward_bias * arch_amount
+	var f_end: float = distance * end_backward_bias * arch_amount
+	var p0: Vector2 = start
+	var p3: Vector2 = end
+	var p1: Vector2 = p0 + n * len_start + dir * f_start
+	var p2: Vector2 = p3 - dir * f_end - n * len_end
+	return [p0, p1, p2, p3]
 
 # [augment] EOF marker

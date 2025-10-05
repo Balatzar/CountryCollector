@@ -14,10 +14,12 @@ bottom_offset = 10.0
 damping = 0.05
 trajectory_width = 5.0
 min_arch_factor = 1.0
-start_handle_strength = -1.0
-end_handle_strength = 0.5
+max_arch_factor = 1.5
+start_handle_strength = 0.0
+end_handle_strength = 0.7
 start_forward_bias = 0.0
-end_backward_bias = 0.0
+end_backward_bias = -0.5
+projectile_rotation_factor = 1.0
 
 [node name="SpriteLeft" type="Sprite2D" parent="."]
 position = Vector2(-12, -299)
