@@ -35,6 +35,9 @@ func _ready() -> void:
 	# Hide debug visualization when game is running
 	debug_point.visible = false
 
+	# Ensure notifications render above everything (UI, overlays, etc.)
+	z_index = 1000
+
 
 func spawn_notification(text: String, custom_color: Color = default_color) -> void:
 	var label := Label.new()

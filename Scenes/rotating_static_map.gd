@@ -25,6 +25,34 @@ var dart_hit_country: bool = false
 const COLOR_HIT = Color.LIGHT_GREEN
 const COLOR_MISS = Color.ORANGE
 const COLOR_COUNTRY = Color.CYAN
+const COLOR_FUN = Color.YELLOW
+
+# Fun notification messages
+const FUN_SUCCESS_MESSAGES = [
+	"WOW!",
+	"Impressive!",
+	"Amazing!",
+	"Spectacular!",
+	"Fantastic!",
+	"Brilliant!",
+	"Incredible!",
+	"Awesome!",
+	"Nice shot!",
+	"Perfect!"
+]
+
+const FUN_FAIL_MESSAGES = [
+	"Oh no!",
+	"Damn!",
+	"Oops!",
+	"So close!",
+	"Missed!",
+	"Not quite!",
+	"Try again!",
+	"Unlucky!",
+	"Oof!",
+	"Almost!"
+]
 
 func _ready() -> void:
 	# Scale the map to fit better in the globe (maps are 1024x512)
@@ -69,6 +97,10 @@ func _on_dart_landed() -> void:
 		# Show miss notification if we didn't hit a country
 		if not dart_hit_country:
 			GameState.show_notification("Miss!", GameState.last_dart_position, COLOR_MISS)
+			# Show fun fail message after 100ms
+			await get_tree().create_timer(0.1).timeout
+			var fun_msg = FUN_FAIL_MESSAGES[randi() % FUN_FAIL_MESSAGES.size()]
+			GameState.show_notification(fun_msg, GameState.last_dart_position, COLOR_FUN)
 
 
 func _on_country_collected(country_id: String) -> void:
@@ -84,6 +116,11 @@ func _on_country_collected(country_id: String) -> void:
 	# Get the country name and show it
 	var country_name := CountryNames.get_country_name(country_id)
 	GameState.show_notification(country_name, GameState.last_dart_position, COLOR_COUNTRY)
+
+	# Wait another 100ms before showing fun success message
+	await get_tree().create_timer(0.1).timeout
+	var fun_msg = FUN_SUCCESS_MESSAGES[randi() % FUN_SUCCESS_MESSAGES.size()]
+	GameState.show_notification(fun_msg, GameState.last_dart_position, COLOR_FUN)
 
 	# Rebuild map copies to reflect the new white color
 	if copies_created and map_copy != null:
