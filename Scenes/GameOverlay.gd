@@ -76,6 +76,17 @@ func _on_darts_changed(remaining_darts: int) -> void:
 	var dart_full_texture: Texture2D = load("res://Assets/dart_left_up.png")
 	var dart_empty_texture: Texture2D = load("res://Assets/dart_left_up_empty.png")
 
+	# If we need more icons than we currently have, add them
+	while dart_icons.size() < remaining_darts:
+		var dart_icon := TextureRect.new()
+		dart_icon.custom_minimum_size = Vector2(32, 32)
+		dart_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		dart_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		dart_icon.texture = dart_full_texture
+		dart_container.add_child(dart_icon)
+		dart_icons.append(dart_icon)
+
+	# Update all existing icons
 	for i in range(dart_icons.size()):
 		if i < remaining_darts:
 			dart_icons[i].texture = dart_full_texture

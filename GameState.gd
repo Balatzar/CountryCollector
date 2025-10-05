@@ -211,6 +211,13 @@ func acquire_card(card_data: Dictionary) -> void:
 	card_acquired.emit(card_data)
 	print("[GameState] Card acquired: ", card_data.get("name", "Unknown"))
 
+	# Apply immediate effects based on card ID
+	var card_id = card_data.get("id", "")
+	if card_id == "extra_shots":
+		remaining_darts += 5
+		darts_changed.emit(remaining_darts)
+		print("[GameState] Added 5 darts, new count: ", remaining_darts)
+
 
 # Check if a specific card has been acquired
 func has_card(card_name: String) -> bool:
