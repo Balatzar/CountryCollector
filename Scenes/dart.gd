@@ -244,6 +244,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		_start_throw_to((event as InputEventMouseButton).position)
 
 func _start_throw_to(mouse_pos: Vector2) -> void:
+	# Check if player has darts remaining
+	if not GameState.has_darts():
+		print("No darts remaining!")
+		return
+
+	# Consume a dart
+	GameState.throw_dart()
+
 	# Record shot start time
 	shot_start_time = Time.get_ticks_msec() / 1000.0
 

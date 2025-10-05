@@ -1,0 +1,141 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkm8y5qvxh3yw"]
+
+[ext_resource type="Script" path="res://Scenes/GameOverlay.gd" id="1_overlay"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.08, 0.08, 0.12, 0.95)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.7, 0.1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_size = 12
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_separator"]
+bg_color = Color(1, 0.7, 0.1, 0.5)
+content_margin_top = 2.0
+content_margin_bottom = 2.0
+
+[node name="GameOverlay" type="CanvasLayer"]
+script = ExtResource("1_overlay")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="LayoutContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="TopBar" type="HBoxContainer" parent="MarginContainer/LayoutContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="TimerPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/TopBar"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="TimerContainer" type="VBoxContainer" parent="MarginContainer/LayoutContainer/TopBar/TimerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="TimerTitle" type="Label" parent="MarginContainer/LayoutContainer/TopBar/TimerPanel/TimerContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+text = "⏱ TIME"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="TimeLabel" type="Label" parent="MarginContainer/LayoutContainer/TopBar/TimerPanel/TimerContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 56
+text = "01:00"
+horizontal_alignment = 1
+
+[node name="DartPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="DartVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/TopBar/DartPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DartTitle" type="Label" parent="MarginContainer/LayoutContainer/TopBar/DartPanel/DartVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 24
+text = "🎯 DARTS"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="DartContainer" type="HBoxContainer" parent="MarginContainer/LayoutContainer/TopBar/DartPanel/DartVBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="Spacer" type="Control" parent="MarginContainer/LayoutContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="RightPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer"]
+custom_minimum_size = Vector2(350, 450)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="CountriesVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/RightPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="CountriesTitle" type="Label" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 28
+text = "🌍 COLLECTED"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Separator" type="HSeparator" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox"]
+custom_minimum_size = Vector2(0, 350)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CountriesList" type="VBoxContainer" parent="MarginContainer/LayoutContainer/RightPanel/CountriesVBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="CountdownTimer" type="Timer" parent="."]
+wait_time = 1.0
+autostart = false
+
+[connection signal="timeout" from="CountdownTimer" to="." method="_on_countdown_timer_timeout"]
+

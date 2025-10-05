@@ -3,6 +3,8 @@ extends Node
 # Signals
 signal countries_loaded()
 signal country_collected(country_id: String)
+signal dart_thrown()
+signal darts_changed(remaining_darts: int)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -12,6 +14,10 @@ var collected_countries: Array[String] = []
 
 # Dictionary mapping country_id to their assigned color
 var country_colors: Dictionary = {}
+
+# Dart tracking
+const MAX_DARTS: int = 10
+var remaining_darts: int = MAX_DARTS
 
 
 func _ready() -> void:
@@ -88,6 +94,26 @@ func get_total_countries() -> int:
 	return all_countries.size()
 
 
+# Throw a dart (decreases remaining darts)
+func throw_dart() -> void:
+	if remaining_darts > 0:
+		remaining_darts -= 1
+		dart_thrown.emit()
+		darts_changed.emit(remaining_darts)
+
+
+# Get remaining darts count
+func get_remaining_darts() -> int:
+	return remaining_darts
+
+
+# Check if player has darts remaining
+func has_darts() -> bool:
+	return remaining_darts > 0
+
+
 # Reset the game state
 func reset() -> void:
 	collected_countries.clear()
+	remaining_darts = MAX_DARTS
+	darts_changed.emit(remaining_darts)
