@@ -1,0 +1,105 @@
+[gd_scene load_steps=6 format=3 uid="uid://zoom_test_scene_001"]
+
+[ext_resource type="Script" path="res://Scenes/ZoomController.gd" id="1_zoom_controller"]
+[ext_resource type="PackedScene" uid="uid://bolaoptqar2l" path="res://Scenes/RotatingStaticMap.tscn" id="2_rotating_map"]
+[ext_resource type="Script" path="res://Scenes/ZoomLevelButtons.gd" id="3_zoom_buttons"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.08, 0.08, 0.12, 0.95)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.7, 0.1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="GDScript" id="GDScript_connector"]
+script/source = "extends Node2D
+
+# Connect the zoom buttons to the zoom controller
+
+@onready var zoom_controller: Node2D = $ZoomController
+@onready var zoom_buttons: HBoxContainer = $UI/MarginContainer/VBoxContainer/ZoomPanel/ZoomButtons
+@onready var rotating_map: Node2D = $ZoomController/RotatingStaticMap
+@onready var instruction_label: Label = $UI/MarginContainer/VBoxContainer/InstructionPanel/InstructionLabel
+
+func _ready() -> void:
+	# Connect zoom button signal to zoom controller
+	zoom_buttons.zoom_level_changed.connect(_on_zoom_level_changed)
+	
+	# Wait for countries to load before starting rotation
+	GameState.countries_loaded.connect(_on_countries_loaded)
+	
+	print(\"[ZoomTestScene] Test scene ready\")
+	print(\"[ZoomTestScene] Instructions:\")
+	print(\"  - Click buttons 1, 2, or 3 to select zoom level\")
+	print(\"  - Hold SPACEBAR to zoom in on mouse cursor\")
+	print(\"  - Release SPACEBAR to zoom out\")
+
+func _on_zoom_level_changed(level: int) -> void:
+	zoom_controller.set_zoom_level(level)
+
+func _on_countries_loaded() -> void:
+	print(\"[ZoomTestScene] Countries loaded, starting rotation\")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
+	
+	if rotating_map and rotating_map.has_method(\"start_rotation\"):
+		rotating_map.start_rotation()
+"
+
+[node name="ZoomTestScene" type="Node2D"]
+script = SubResource("GDScript_connector")
+
+[node name="ZoomController" type="Node2D" parent="."]
+script = ExtResource("1_zoom_controller")
+
+[node name="RotatingStaticMap" parent="ZoomController" instance=ExtResource("2_rotating_map")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="InstructionPanel" type="PanelContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="InstructionLabel" type="Label" parent="UI/MarginContainer/VBoxContainer/InstructionPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "🔍 ZOOM TEST
+Select zoom level (1, 2, or 3) then hold SPACEBAR to zoom"
+horizontal_alignment = 1
+
+[node name="ZoomPanel" type="PanelContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="ZoomButtons" type="HBoxContainer" parent="UI/MarginContainer/VBoxContainer/ZoomPanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+script = ExtResource("3_zoom_buttons")
+
