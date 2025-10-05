@@ -8,6 +8,8 @@ signal dart_landed()
 signal darts_changed(remaining_darts: int)
 signal loading_started(total: int)
 signal country_loading_progress(loaded: int, total: int)
+signal store_opened()
+signal card_acquired(card_data: Dictionary)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -24,6 +26,10 @@ var pending_country: String = ""
 # Dart tracking
 const MAX_DARTS: int = 10
 var remaining_darts: int = MAX_DARTS
+
+# Card/bonus tracking
+var acquired_cards: Array[Dictionary] = []
+
 # Loading state
 var loading_in_progress: bool = false
 var countries_loaded_count: int = 0
@@ -155,4 +161,30 @@ func has_darts() -> bool:
 func reset() -> void:
 	collected_countries.clear()
 	remaining_darts = MAX_DARTS
+	acquired_cards.clear()
 	darts_changed.emit(remaining_darts)
+
+
+# Open the store overlay
+func open_store() -> void:
+	store_opened.emit()
+
+
+# Acquire a card and apply its effects
+func acquire_card(card_data: Dictionary) -> void:
+	acquired_cards.append(card_data)
+	card_acquired.emit(card_data)
+	print("[GameState] Card acquired: ", card_data.get("name", "Unknown"))
+
+
+# Check if a specific card has been acquired
+func has_card(card_name: String) -> bool:
+	for card in acquired_cards:
+		if card.get("name", "") == card_name:
+			return true
+	return false
+
+
+# Get all acquired cards
+func get_acquired_cards() -> Array[Dictionary]:
+	return acquired_cards.duplicate()
