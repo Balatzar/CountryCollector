@@ -514,19 +514,20 @@ func get_vertical_drift_amplitude() -> float:
 
 
 func get_direction_chaos_frequency() -> float:
-	"""Returns frequency (changes per second) for map rotation direction chaos based on tier
-	The map will randomly flip rotation direction (clockwise <-> counterclockwise)"""
+	"""Returns average frequency (changes per second) for map rotation direction chaos based on tier
+	The map will randomly flip rotation direction (clockwise <-> counterclockwise)
+	The actual timing is randomized to be unpredictable"""
 	match direction_chaos_tier:
 		1:
-			return 0.2  # Flip direction every 5 seconds
+			return 0.067  # Average: Flip direction every ~15 seconds (range 10-20s)
 		2:
-			return 0.4  # Flip direction every 2.5 seconds
+			return 0.11  # Average: Flip direction every ~9 seconds (range 6-12s)
 		3:
-			return 0.75  # Flip direction every ~1.3 seconds
+			return 0.167  # Average: Flip direction every ~6 seconds (range 4-8s)
 		4:
-			return 1.5  # Flip direction every ~0.67 seconds
+			return 0.25  # Average: Flip direction every ~4 seconds (range 2.7-5.3s)
 		5:
-			return 3.0  # Flip direction every ~0.33 seconds
+			return 0.125  # Average: Flip direction every ~8 seconds (range 6-10s)
 		_:
 			return 0.0  # No chaos
 

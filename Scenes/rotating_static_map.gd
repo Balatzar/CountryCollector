@@ -282,15 +282,20 @@ func _process(delta: float) -> void:
 		if direction_chaos_next_change_time <= 0.0:
 			# Flip direction
 			direction_multiplier *= -1
-			# Schedule next change
-			direction_chaos_next_change_time = 1.0 / direction_chaos_frequency
-			print("[RotatingMap] Direction chaos! Flipped direction, multiplier now: ", direction_multiplier)
+			# Schedule next change with randomization (0.5x to 2.0x the average interval)
+			# This creates very irregular timing so you can't predict when the direction will change
+			var base_interval = 1.0 / direction_chaos_frequency
+			var random_multiplier = randf_range(0.5, 2.0)
+			direction_chaos_next_change_time = base_interval * random_multiplier
+			print("[RotatingMap] Direction chaos! Flipped direction, multiplier now: ", direction_multiplier, " next change in: ", direction_chaos_next_change_time, "s")
 
 	# Update scroll offset (in unscaled space)
 	scroll_offset += scroll_speed * direction_multiplier * delta
 
-	# Wrap offset to stay within one map width
+	# Wrap offset to stay within one map width (handle negative values)
 	scroll_offset = fmod(scroll_offset, map_width)
+	if scroll_offset < 0:
+		scroll_offset += map_width
 
 	# Update vertical drift time
 	if vertical_drift_amplitude > 0.0:
@@ -403,7 +408,10 @@ func _update_direction_chaos() -> void:
 	"""Update direction chaos parameters based on current value from GameState"""
 	direction_chaos_frequency = GameState.get_direction_chaos_frequency()
 	if direction_chaos_frequency > 0.0:
-		direction_chaos_next_change_time = 1.0 / direction_chaos_frequency
+		# Initialize with randomized timing
+		var base_interval = 1.0 / direction_chaos_frequency
+		var random_multiplier = randf_range(0.5, 2.0)
+		direction_chaos_next_change_time = base_interval * random_multiplier
 	print("[RotatingMap] Direction chaos frequency updated to: ", direction_chaos_frequency)
 
 
