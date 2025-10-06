@@ -170,10 +170,9 @@ func _create_country_sprite(country_id: String):
 	# Store sprite reference
 	country_sprites[country_id] = sprite
 
-	# Register color in GameState (only if not collected, gold countries don't need color tracking)
+	# Register color in GameState for both collected and uncollected countries
 	GameState.add_country(country_id)
-	if not is_collected:
-		GameState.register_country_color(country_id, color_to_use)
+	GameState.register_country_color(country_id, color_to_use)
 
 func _on_country_collected(country_id: String):
 	# Update the sprite color to gold when collected
@@ -198,3 +197,6 @@ func _on_country_collected(country_id: String):
 			gold_image.set_pixel(x, y, Color(gold_color.r, gold_color.g, gold_color.b, alpha_value))
 
 	sprite.texture = ImageTexture.create_from_image(gold_image)
+
+	# Update the color registration to gold so clicks on collected countries work
+	GameState.register_country_color(country_id, gold_color)

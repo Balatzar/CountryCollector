@@ -161,6 +161,16 @@ const BONUS_EXTRA_XP_T5 = {
 	"repeatable": false
 }
 
+const BONUS_DART_REFUND = {
+	"id": "dart_refund",
+	"type": PowerUpType.BONUS,
+	"name": "Dart Insurance",
+	"description": "Get your dart back when hitting collected countries",
+	"family": "dart_refund",
+	"tier": 1,
+	"repeatable": false
+}
+
 # ===== MALUSES =====
 
 const MALUS_FASTER_MAP_T1 = {
@@ -331,7 +341,8 @@ const ALL_BONUSES = [
 	BONUS_EXTRA_XP_T2,
 	BONUS_EXTRA_XP_T3,
 	BONUS_EXTRA_XP_T4,
-	BONUS_EXTRA_XP_T5
+	BONUS_EXTRA_XP_T5,
+	BONUS_DART_REFUND
 ]
 
 # All maluses available for selection

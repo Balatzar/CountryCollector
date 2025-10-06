@@ -112,8 +112,29 @@ func _on_dart_thrown() -> void:
 func _on_dart_landed() -> void:
 	# Collect the pending country when dart lands
 	if GameState.pending_country != "":
-		GameState.collect_country(GameState.pending_country)
+		# Check if the country is already collected (for dart refund)
+		var was_already_collected = GameState.is_collected(GameState.pending_country)
+		var country_id = GameState.pending_country
+
+		print("[DEBUG] Dart landed on country: ", country_id)
+		print("[DEBUG] Was already collected: ", was_already_collected)
+		print("[DEBUG] Has dart refund power-up: ", GameState.has_dart_refund)
+
+		GameState.collect_country(country_id)
 		GameState.pending_country = ""
+
+		# If dart refund is active and country was already collected, refund the dart
+		if was_already_collected and GameState.has_dart_refund:
+			print("[DEBUG] Refunding dart!")
+			# Mark that this dart hit a country (even if already collected)
+			dart_hit_country = true
+
+			GameState.refund_dart()
+
+			# Show notifications for already-collected country
+			GameState.show_notification("Already collected!", GameState.last_dart_position, COLOR_COUNTRY)
+			await get_tree().create_timer(0.2).timeout
+			GameState.show_notification("Reimbursed!", GameState.last_dart_position, COLOR_HIT)
 	else:
 		# Show miss notification if we didn't hit a country
 		if not dart_hit_country:

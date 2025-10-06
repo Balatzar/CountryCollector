@@ -55,6 +55,9 @@ var vertical_drift_tier: int = 0  # Track highest vertical movement malus tier (
 # Extra XP bonus tracking
 var extra_xp_bonus_tier: int = 0  # Track highest extra XP bonus tier (0-5)
 
+# Dart refund tracking
+var has_dart_refund: bool = false  # Track if dart refund power-up is acquired
+
 # Loading state
 var loading_in_progress: bool = false
 var countries_loaded_count: int = 0
@@ -217,6 +220,13 @@ func has_darts() -> bool:
 	return remaining_darts > 0
 
 
+# Refund a dart (used when hitting already-collected countries with dart refund power-up)
+func refund_dart() -> void:
+	remaining_darts += 1
+	darts_changed.emit(remaining_darts)
+	print("[GameState] Dart refunded. New count: ", remaining_darts)
+
+
 # Reset the game state
 func reset() -> void:
 	collected_countries.clear()
@@ -229,6 +239,7 @@ func reset() -> void:
 	current_zoom_level = 0
 	vertical_drift_tier = 0
 	extra_xp_bonus_tier = 0
+	has_dart_refund = false
 	darts_changed.emit(remaining_darts)
 	xp_changed.emit(xp, level)
 
@@ -321,6 +332,10 @@ func acquire_card(card_data: Dictionary) -> void:
 		elif card_id == "extra_xp_t5":
 			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 5)
 		print("[GameState] Extra XP bonus tier updated: ", extra_xp_bonus_tier)
+	elif card_id == "dart_refund":
+		# Enable dart refund
+		has_dart_refund = true
+		print("[GameState] Dart refund enabled")
 
 
 # Check if a specific card has been acquired
