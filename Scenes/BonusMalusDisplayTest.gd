@@ -65,4 +65,3 @@ func _update_info_label() -> void:
 	"""Update the info label with current card count"""
 	var acquired_count := GameState.get_acquired_cards().size()
 	info_label.text = "Cards Acquired: %d\nPress button to open store\n\nCheck left side for bonus/malus display!" % acquired_count
-

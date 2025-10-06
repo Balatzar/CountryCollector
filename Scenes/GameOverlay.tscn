@@ -52,56 +52,32 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="BonusVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel"]
+[node name="BonusVBox" type="MarginContainer" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel"]
 layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="BonusTitle" type="Label" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 1, 0.5, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 24
-text = "✓ BONUSES"
-horizontal_alignment = 1
-uppercase = true
-
-[node name="BonusSeparator" type="HSeparator" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
 
 [node name="BonusEffectsList" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="MalusPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/LeftPanel"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="MalusVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel"]
+[node name="MalusVBox" type="MarginContainer" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel"]
 layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="MalusTitle" type="Label" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 24
-text = "✗ MALUSES"
-horizontal_alignment = 1
-uppercase = true
-
-[node name="MalusSeparator" type="HSeparator" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-theme_override_styles/separator = SubResource("StyleBoxFlat_separator")
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
 
 [node name="MalusEffectsList" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
 [node name="ZoomHelpPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/LeftPanel"]
 visible = false

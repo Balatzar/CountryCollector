@@ -71,68 +71,49 @@ script = ExtResource("1_card_script")
 
 [node name="CardVBox" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 15
+theme_override_constants/separation = 20
 
-[node name="CardNameLabel" type="Label" parent="CardVBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.7, 0.1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 24
-text = "Card Name"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="HSeparator1" type="HSeparator" parent="CardVBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="BonusSection" type="VBoxContainer" parent="CardVBox"]
+[node name="BonusSection" type="MarginContainer" parent="CardVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="BonusTitle" type="Label" parent="CardVBox/BonusSection"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 1, 0.5, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 18
-text = "BONUS"
-horizontal_alignment = 1
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
 
 [node name="BonusContainer" type="VBoxContainer" parent="CardVBox/BonusSection"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 5
+theme_override_constants/separation = 8
+alignment = 1
 
-[node name="HSeparator2" type="HSeparator" parent="CardVBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="MalusSection" type="VBoxContainer" parent="CardVBox"]
+[node name="ButtSection" type="MarginContainer" parent="CardVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 8
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
 
-[node name="MalusTitle" type="Label" parent="CardVBox/MalusSection"]
+[node name="Label" type="Label" parent="CardVBox/ButtSection"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 18
-text = "MALUS"
+theme_override_font_sizes/font_size = 20
+text = "but"
 horizontal_alignment = 1
+
+[node name="MalusSection" type="MarginContainer" parent="CardVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 10
 
 [node name="MalusContainer" type="VBoxContainer" parent="CardVBox/MalusSection"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 5
-
-[node name="HSeparator3" type="HSeparator" parent="CardVBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
+alignment = 1
 
 [node name="SelectButton" type="Button" parent="CardVBox"]
 custom_minimum_size = Vector2(0, 50)

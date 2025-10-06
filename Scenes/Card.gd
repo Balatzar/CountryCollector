@@ -14,7 +14,6 @@ var card_data: Dictionary = {
 }
 
 # Node references
-@onready var card_name_label: Label = $CardVBox/CardNameLabel
 @onready var bonus_container: VBoxContainer = $CardVBox/BonusSection/BonusContainer
 @onready var malus_container: VBoxContainer = $CardVBox/MalusSection/MalusContainer
 @onready var select_button: Button = $CardVBox/SelectButton
@@ -60,15 +59,12 @@ func set_card_data(data: Dictionary) -> void:
 
 func _update_card_display() -> void:
 	"""Update all card UI elements based on card_data"""
-	# Update card name
-	card_name_label.text = card_data.get("name", "Unknown Card")
-	
 	# Clear existing bonus/malus labels
 	for child in bonus_container.get_children():
 		child.queue_free()
 	for child in malus_container.get_children():
 		child.queue_free()
-	
+
 	# Add bonus labels
 	var bonuses: Array = card_data.get("bonuses", [])
 	for bonus in bonuses:
@@ -77,20 +73,19 @@ func _update_card_display() -> void:
 		if bonus is String:
 			bonus_text = str(bonus)
 		elif bonus is Dictionary:
-			# Display name and description
-			var bonus_name: String = bonus.get("name", "Unknown Bonus")
-			var bonus_desc: String = bonus.get("description", "")
-			bonus_text = bonus_name
-			if bonus_desc != "":
-				bonus_text += "\n" + bonus_desc
+			# Display only the description (not the name)
+			bonus_text = bonus.get("description", "")
 
 		var label := Label.new()
-		label.text = "✓ " + bonus_text
+		label.text = bonus_text
 		label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))  # Green
-		label.add_theme_font_size_override("font_size", 14)
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		label.add_theme_constant_override("outline_size", 4)
+		label.add_theme_font_size_override("font_size", 28)  # 2x bigger (was 14)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		bonus_container.add_child(label)
-	
+
 	# Add malus labels
 	var maluses: Array = card_data.get("maluses", [])
 	for malus in maluses:
@@ -99,17 +94,16 @@ func _update_card_display() -> void:
 		if malus is String:
 			malus_text = str(malus)
 		elif malus is Dictionary:
-			# Display name and description
-			var malus_name: String = malus.get("name", "Unknown Malus")
-			var malus_desc: String = malus.get("description", "")
-			malus_text = malus_name
-			if malus_desc != "":
-				malus_text += "\n" + malus_desc
+			# Display only the description (not the name)
+			malus_text = malus.get("description", "")
 
 		var label := Label.new()
-		label.text = "✗ " + malus_text
+		label.text = malus_text
 		label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))  # Red
-		label.add_theme_font_size_override("font_size", 14)
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+		label.add_theme_constant_override("outline_size", 4)
+		label.add_theme_font_size_override("font_size", 28)  # 2x bigger (was 14)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		malus_container.add_child(label)
 
@@ -177,4 +171,3 @@ func _reset_hover_effect() -> void:
 		scale = Vector2.ONE
 		current_rotation = 0.0
 		current_scale = Vector2.ONE
-

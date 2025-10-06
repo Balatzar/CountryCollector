@@ -133,14 +133,14 @@ func _update_card_displays() -> void:
 	for power_up in acquired_cards:
 		# Check if this is a new-style power-up (has "type" field)
 		if power_up.has("type"):
-			var power_up_name: String = power_up.get("name", "Unknown")
+			var power_up_desc: String = power_up.get("description", "Unknown")
 			var power_up_type: int = power_up.get("type", 0)
 
 			# PowerUpDefinitions.PowerUpType enum: BONUS = 0, MALUS = 1
 			if power_up_type == 0:  # BONUS
-				all_bonuses.append(power_up_name)
+				all_bonuses.append(power_up_desc)
 			else:  # MALUS
-				all_maluses.append(power_up_name)
+				all_maluses.append(power_up_desc)
 		else:
 			# Legacy format: card with bonuses/maluses arrays
 			var bonuses: Array = power_up.get("bonuses", [])
@@ -156,11 +156,12 @@ func _update_card_displays() -> void:
 	if all_bonuses.size() > 0:
 		for bonus_text in all_bonuses:
 			var label := Label.new()
-			label.text = "✓ " + bonus_text
+			label.text = bonus_text
 			label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))  # Green
 			label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
-			label.add_theme_constant_override("outline_size", 3)
-			label.add_theme_font_size_override("font_size", 18)
+			label.add_theme_constant_override("outline_size", 4)
+			label.add_theme_font_size_override("font_size", 24)  # Bigger text (was 18)
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			bonus_container.add_child(label)
 		bonus_panel.visible = true
@@ -171,11 +172,12 @@ func _update_card_displays() -> void:
 	if all_maluses.size() > 0:
 		for malus_text in all_maluses:
 			var label := Label.new()
-			label.text = "✗ " + malus_text
+			label.text = malus_text
 			label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))  # Red
 			label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
-			label.add_theme_constant_override("outline_size", 3)
-			label.add_theme_font_size_override("font_size", 18)
+			label.add_theme_constant_override("outline_size", 4)
+			label.add_theme_font_size_override("font_size", 24)  # Bigger text (was 18)
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			malus_container.add_child(label)
 		malus_panel.visible = true
