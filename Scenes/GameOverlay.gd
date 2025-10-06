@@ -13,6 +13,8 @@ extends CanvasLayer
 @onready var zoom_help_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/ZoomHelpPanel
 @onready var time_freeze_help_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/TimeFreezeHelpPanel
 @onready var time_freeze_help_label: Label = $MarginContainer/LayoutContainer/LeftPanel/TimeFreezeHelpPanel/TimeFreezeHelpVBox/TimeFreezeHelpLabel
+@onready var multishot_help_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/MultishotHelpPanel
+@onready var multishot_help_label: Label = $MarginContainer/LayoutContainer/LeftPanel/MultishotHelpPanel/MultishotHelpVBox/MultishotHelpLabel
 
 # Dart icon references for updating
 var dart_icons: Array[TextureRect] = []
@@ -31,6 +33,7 @@ func _ready() -> void:
 	GameState.card_acquired.connect(_on_card_acquired)
 	GameState.zoom_bonus_acquired.connect(_on_zoom_bonus_acquired)
 	GameState.time_freeze_changed.connect(_on_time_freeze_changed)
+	GameState.multishot_changed.connect(_on_multishot_changed)
 	GameState.countries_loaded.connect(_on_countries_loaded)
 
 	# Initialize countries list with any already collected countries
@@ -200,3 +203,20 @@ func _on_time_freeze_changed(tier: int, shots_until_ready: int, available: bool)
 			time_freeze_help_label.text = "⏸ TIME FREEZE UNLOCKED\n\nPress ENTER to freeze (READY!)"
 		else:
 			time_freeze_help_label.text = "⏸ TIME FREEZE UNLOCKED\n\nPress ENTER to freeze\n(Ready in %d shot%s)" % [shots_until_ready, "s" if shots_until_ready != 1 else ""]
+
+
+func _on_multishot_changed(tier: int, shots_until_ready: int, available: bool) -> void:
+	"""Show/hide the multishot help panel and update counter"""
+	# Show help panel only if multishot is acquired (tier > 0)
+	multishot_help_panel.visible = (tier > 0)
+
+	if tier > 0:
+		var salvo_size = GameState.get_multishot_salvo_size()
+
+		# Update label text based on availability and activity
+		if GameState.is_multishot_active:
+			multishot_help_label.text = "⚡ MULTISHOT ACTIVE\n\nRapid-fire in progress!\n(%d shots remaining)" % GameState.multishot_remaining_shots
+		elif available:
+			multishot_help_label.text = "⚡ MULTISHOT READY\n\nAuto-firing %d shots!" % salvo_size
+		else:
+			multishot_help_label.text = "⚡ MULTISHOT UNLOCKED\n\nAuto rapid-fire %d shots\n(Ready in %d shot%s)" % [salvo_size, shots_until_ready, "s" if shots_until_ready != 1 else ""]

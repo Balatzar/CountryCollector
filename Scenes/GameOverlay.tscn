@@ -121,6 +121,28 @@ text = "⏸ TIME FREEZE UNLOCKED
 Press ENTER to freeze (READY!)"
 horizontal_alignment = 1
 
+[node name="MultishotHelpPanel" type="PanelContainer" parent="MarginContainer/LayoutContainer/LeftPanel"]
+visible = false
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MultishotHelpVBox" type="VBoxContainer" parent="MarginContainer/LayoutContainer/LeftPanel/MultishotHelpPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MultishotHelpLabel" type="Label" parent="MarginContainer/LayoutContainer/LeftPanel/MultishotHelpPanel/MultishotHelpVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "⚡ MULTISHOT UNLOCKED
+
+Auto rapid-fire 5 shots
+(Ready in 10 shots)"
+horizontal_alignment = 1
+
 [node name="CenterAndRightContainer" type="VBoxContainer" parent="MarginContainer/LayoutContainer"]
 layout_mode = 2
 size_flags_horizontal = 3

@@ -122,6 +122,9 @@ func _on_dart_landed() -> void:
 	# Unfreeze time when dart lands
 	GameState.unfreeze_time()
 
+	# Skip streak logic during multishot
+	var is_multishot = GameState.is_multishot_active
+
 	# Collect the pending country when dart lands
 	if GameState.pending_country != "":
 		# Check if the country is already collected (for dart refund)
@@ -135,27 +138,29 @@ func _on_dart_landed() -> void:
 		GameState.collect_country(country_id)
 		GameState.pending_country = ""
 
-		# Update streak: increment on successful hit
-		GameState.current_streak += 1
-		print("[STREAK] Hit! Current streak: ", GameState.current_streak)
+		# Update streak: increment on successful hit (but not during multishot)
+		if not is_multishot:
+			GameState.current_streak += 1
+			print("[STREAK] Hit! Current streak: ", GameState.current_streak)
 
-		# Check if we just activated streak mode
-		if not GameState.is_on_streak and GameState.current_streak >= GameState.STREAK_THRESHOLD:
-			GameState.is_on_streak = true
-			GameState.streak_started.emit(GameState.current_streak)
-			print("[STREAK] Streak activated at ", GameState.current_streak, " hits!")
+		# Check if we just activated streak mode (but not during multishot)
+		if not is_multishot:
+			if not GameState.is_on_streak and GameState.current_streak >= GameState.STREAK_THRESHOLD:
+				GameState.is_on_streak = true
+				GameState.streak_started.emit(GameState.current_streak)
+				print("[STREAK] Streak activated at ", GameState.current_streak, " hits!")
 
-			# Show dramatic streak activation notification
-			await get_tree().create_timer(0.6).timeout  # Wait a bit for effect
-			GameState.show_notification("🔥 STREAK ACTIVATED! 🔥", GameState.last_dart_position, COLOR_STREAK)
-		elif GameState.is_on_streak:
-			# Already on streak: refund 1 dart for successful hit
-			GameState.refund_dart()
-			print("[STREAK] Hit during streak! Dart refunded. New count: ", GameState.get_remaining_darts())
+				# Show dramatic streak activation notification
+				await get_tree().create_timer(0.6).timeout  # Wait a bit for effect
+				GameState.show_notification("🔥 STREAK ACTIVATED! 🔥", GameState.last_dart_position, COLOR_STREAK)
+			elif GameState.is_on_streak:
+				# Already on streak: refund 1 dart for successful hit
+				GameState.refund_dart()
+				print("[STREAK] Hit during streak! Dart refunded. New count: ", GameState.get_remaining_darts())
 
-			# Show dart refund notification during streak
-			await get_tree().create_timer(0.6).timeout
-			GameState.show_notification("+1 DART (Streak Bonus!)", GameState.last_dart_position, COLOR_STREAK)
+				# Show dart refund notification during streak
+				await get_tree().create_timer(0.6).timeout
+				GameState.show_notification("+1 DART (Streak Bonus!)", GameState.last_dart_position, COLOR_STREAK)
 
 		# If dart refund is active and country was already collected, refund the dart
 		if was_already_collected and GameState.has_dart_refund:
@@ -170,21 +175,22 @@ func _on_dart_landed() -> void:
 			await get_tree().create_timer(0.2).timeout
 			GameState.show_notification("Reimbursed!", GameState.last_dart_position, COLOR_HIT)
 	else:
-		# Miss: break streak if active
-		if GameState.is_on_streak:
-			var final_streak = GameState.current_streak
-			GameState.is_on_streak = false
-			GameState.current_streak = 0
-			GameState.streak_ended.emit(final_streak)
-			print("[STREAK] Streak ended at ", final_streak, " hits")
+		# Miss: break streak if active (but not during multishot)
+		if not is_multishot:
+			if GameState.is_on_streak:
+				var final_streak = GameState.current_streak
+				GameState.is_on_streak = false
+				GameState.current_streak = 0
+				GameState.streak_ended.emit(final_streak)
+				print("[STREAK] Streak ended at ", final_streak, " hits")
 
-			# Show streak end notification
-			GameState.show_notification("STREAK ENDED! (" + str(final_streak) + " hits)", GameState.last_dart_position, COLOR_STREAK)
-			await get_tree().create_timer(0.2).timeout
-		else:
-			# Reset streak counter on miss (even if not in streak mode yet)
-			GameState.current_streak = 0
-			print("[STREAK] Miss! Streak reset to 0")
+				# Show streak end notification
+				GameState.show_notification("STREAK ENDED! (" + str(final_streak) + " hits)", GameState.last_dart_position, COLOR_STREAK)
+				await get_tree().create_timer(0.2).timeout
+			else:
+				# Reset streak counter on miss (even if not in streak mode yet)
+				GameState.current_streak = 0
+				print("[STREAK] Miss! Streak reset to 0")
 
 		# Show miss notification if we didn't hit a country
 		if not dart_hit_country:

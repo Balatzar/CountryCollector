@@ -221,6 +221,56 @@ const BONUS_TIME_FREEZE_T5 = {
 	"repeatable": false
 }
 
+const BONUS_MULTISHOT_T1 = {
+	"id": "multishot_t1",
+	"type": PowerUpType.BONUS,
+	"name": "Multishot I",
+	"description": "Auto rapid-fire 5 shots (every 10 shots)",
+	"family": "multishot",
+	"tier": 1,
+	"repeatable": false
+}
+
+const BONUS_MULTISHOT_T2 = {
+	"id": "multishot_t2",
+	"type": PowerUpType.BONUS,
+	"name": "Multishot II",
+	"description": "Auto rapid-fire 8 shots (every 10 shots)",
+	"family": "multishot",
+	"tier": 2,
+	"repeatable": false
+}
+
+const BONUS_MULTISHOT_T3 = {
+	"id": "multishot_t3",
+	"type": PowerUpType.BONUS,
+	"name": "Multishot III",
+	"description": "Auto rapid-fire 12 shots (every 10 shots)",
+	"family": "multishot",
+	"tier": 3,
+	"repeatable": false
+}
+
+const BONUS_MULTISHOT_T4 = {
+	"id": "multishot_t4",
+	"type": PowerUpType.BONUS,
+	"name": "Multishot IV",
+	"description": "Auto rapid-fire 16 shots (every 10 shots)",
+	"family": "multishot",
+	"tier": 4,
+	"repeatable": false
+}
+
+const BONUS_MULTISHOT_T5 = {
+	"id": "multishot_t5",
+	"type": PowerUpType.BONUS,
+	"name": "Multishot V",
+	"description": "Auto rapid-fire 20 shots (every 10 shots)",
+	"family": "multishot",
+	"tier": 5,
+	"repeatable": false
+}
+
 # ===== MALUSES =====
 
 const MALUS_FASTER_MAP_T1 = {
@@ -447,7 +497,12 @@ const ALL_BONUSES = [
 	BONUS_TIME_FREEZE_T2,
 	BONUS_TIME_FREEZE_T3,
 	BONUS_TIME_FREEZE_T4,
-	BONUS_TIME_FREEZE_T5
+	BONUS_TIME_FREEZE_T5,
+	BONUS_MULTISHOT_T1,
+	BONUS_MULTISHOT_T2,
+	BONUS_MULTISHOT_T3,
+	BONUS_MULTISHOT_T4,
+	BONUS_MULTISHOT_T5
 ]
 
 # All maluses available for selection

@@ -25,6 +25,8 @@ signal time_freeze_changed(tier: int, shots_until_ready: int, available: bool)
 signal game_over()
 signal streak_started(streak_count: int)
 signal streak_ended(final_count: int)
+signal multishot_changed(tier: int, shots_until_ready: int, available: bool)
+signal multishot_triggered(salvo_size: int)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -71,6 +73,13 @@ var time_freeze_tier: int = 0  # Track highest time freeze bonus tier (0-5)
 var time_freeze_available: bool = false  # Track if power is ready to use
 var time_freeze_shots_until_ready: int = 0  # Counter for shots remaining until ready
 var is_time_frozen: bool = false  # Track if time is currently frozen
+
+# Multishot tracking
+var multishot_tier: int = 0  # Track highest multishot bonus tier (0-5)
+var multishot_shots_until_ready: int = 10  # Counter for activation (every 10 shots)
+var multishot_available: bool = false  # Whether multishot is ready to trigger
+var is_multishot_active: bool = false  # Currently firing salvo
+var multishot_remaining_shots: int = 0  # Shots left in current salvo
 
 # Streak tracking
 const STREAK_THRESHOLD: int = 3  # Number of consecutive hits needed to activate streak
@@ -219,12 +228,20 @@ func get_total_countries() -> int:
 
 # Throw a dart (decreases remaining darts)
 func throw_dart() -> void:
-	if remaining_darts > 0:
-		remaining_darts -= 1
-		darts_thrown += 1
-		dart_thrown.emit()
-		darts_changed.emit(remaining_darts)
+	# Only consume darts if not in multishot mode
+	if not is_multishot_active:
+		if remaining_darts > 0:
+			remaining_darts -= 1
+			darts_changed.emit(remaining_darts)
 
+		# Only track darts thrown when not in multishot
+		darts_thrown += 1
+
+	# Always emit signal
+	dart_thrown.emit()
+
+	# Only update cooldowns when not in multishot mode
+	if not is_multishot_active:
 		# Update time freeze cooldown if power-up is acquired
 		if time_freeze_tier > 0 and not time_freeze_available:
 			time_freeze_shots_until_ready -= 1
@@ -233,6 +250,15 @@ func throw_dart() -> void:
 				time_freeze_shots_until_ready = 0
 				print("[GameState] Time freeze ready!")
 			time_freeze_changed.emit(time_freeze_tier, time_freeze_shots_until_ready, time_freeze_available)
+
+		# Update multishot cooldown if power-up is acquired
+		if multishot_tier > 0 and not multishot_available:
+			multishot_shots_until_ready -= 1
+			if multishot_shots_until_ready <= 0:
+				multishot_available = true
+				multishot_shots_until_ready = 0
+				print("[GameState] Multishot ready!")
+			multishot_changed.emit(multishot_tier, multishot_shots_until_ready, multishot_available)
 
 		# Check for game over
 		if remaining_darts == 0:
@@ -280,6 +306,11 @@ func reset() -> void:
 	time_freeze_available = false
 	time_freeze_shots_until_ready = 0
 	is_time_frozen = false
+	multishot_tier = 0
+	multishot_shots_until_ready = 10
+	multishot_available = false
+	is_multishot_active = false
+	multishot_remaining_shots = 0
 	current_streak = 0
 	is_on_streak = false
 	darts_changed.emit(remaining_darts)
@@ -415,6 +446,26 @@ func acquire_card(card_data: Dictionary) -> void:
 		# Emit signal to update UI
 		time_freeze_changed.emit(time_freeze_tier, time_freeze_shots_until_ready, time_freeze_available)
 		print("[GameState] Time freeze tier updated: ", time_freeze_tier, " (cooldown: ", get_time_freeze_cooldown(), " shots)")
+	elif card_id.begins_with("multishot_"):
+		# Update multishot tier (keep highest acquired)
+		if card_id == "multishot_t1":
+			multishot_tier = max(multishot_tier, 1)
+		elif card_id == "multishot_t2":
+			multishot_tier = max(multishot_tier, 2)
+		elif card_id == "multishot_t3":
+			multishot_tier = max(multishot_tier, 3)
+		elif card_id == "multishot_t4":
+			multishot_tier = max(multishot_tier, 4)
+		elif card_id == "multishot_t5":
+			multishot_tier = max(multishot_tier, 5)
+
+		# Make it available immediately on acquisition (like time freeze)
+		multishot_available = true
+		multishot_shots_until_ready = 0
+
+		# Emit signal to update UI
+		multishot_changed.emit(multishot_tier, multishot_shots_until_ready, multishot_available)
+		print("[GameState] Multishot tier updated: ", multishot_tier, " (salvo size: ", get_multishot_salvo_size(), " shots - READY!)")
 
 
 # Check if a specific card has been acquired
@@ -575,6 +626,51 @@ func get_time_freeze_cooldown() -> int:
 			return 6
 		_:
 			return 0
+
+
+# Get the multishot salvo size based on tier
+func get_multishot_salvo_size() -> int:
+	match multishot_tier:
+		1:
+			return 5
+		2:
+			return 8
+		3:
+			return 12
+		4:
+			return 16
+		5:
+			return 20
+		_:
+			return 0
+
+
+# Trigger multishot salvo
+func trigger_multishot() -> int:
+	if not multishot_available or multishot_tier == 0:
+		return 0
+
+	var salvo_size = get_multishot_salvo_size()
+	is_multishot_active = true
+	multishot_available = false
+	multishot_remaining_shots = salvo_size
+	multishot_shots_until_ready = 10  # Reset counter
+
+	# Emit signal to start the salvo
+	multishot_triggered.emit(salvo_size)
+	multishot_changed.emit(multishot_tier, multishot_shots_until_ready, multishot_available)
+	print("[GameState] Multishot activated! Firing ", salvo_size, " shots")
+
+	return salvo_size
+
+
+# Finish multishot salvo
+func finish_multishot() -> void:
+	if is_multishot_active:
+		is_multishot_active = false
+		multishot_remaining_shots = 0
+		print("[GameState] Multishot complete")
+		multishot_changed.emit(multishot_tier, multishot_shots_until_ready, multishot_available)
 
 
 # Use the time freeze ability

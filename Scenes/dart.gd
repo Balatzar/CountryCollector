@@ -45,6 +45,9 @@ extends Node2D
 @onready var tip_anchor_center: Node2D = get_node_or_null("SpriteCenter/TipAnchor")
 @onready var tip_anchor_right: Node2D = get_node_or_null("SpriteRight/TipAnchor")
 
+# Multishot timer
+var multishot_timer: Timer = null
+
 # Target and current positions
 var target_x: float = 0.0
 var current_x: float = 0.0
@@ -84,6 +87,17 @@ func _ready() -> void:
 	# Connect to loading signals to control shooting
 	GameState.loading_started.connect(_on_loading_started)
 	GameState.countries_loaded.connect(_on_loading_complete)
+
+	# Connect to multishot signals
+	GameState.multishot_triggered.connect(_on_multishot_triggered)
+	GameState.multishot_changed.connect(_on_multishot_changed)
+
+	# Create multishot timer
+	multishot_timer = Timer.new()
+	multishot_timer.wait_time = 0.2  # Rapid fire rate (200ms between shots)
+	multishot_timer.one_shot = false
+	multishot_timer.timeout.connect(_on_multishot_timer_timeout)
+	add_child(multishot_timer)
 
 func _process(_delta: float) -> void:
 	# Get mouse position
@@ -261,6 +275,11 @@ func _start_throw_to(mouse_pos: Vector2) -> void:
 		print("No darts remaining!")
 		return
 
+	# Check if multishot should trigger before the manual shot
+	if GameState.multishot_available and not GameState.is_multishot_active:
+		GameState.trigger_multishot()
+		return  # Don't fire the manual shot, multishot will start
+
 	# Consume a dart
 	GameState.throw_dart()
 
@@ -417,3 +436,98 @@ func _on_loading_started(_total: int) -> void:
 func _on_loading_complete() -> void:
 	# Enable shooting once loading is complete
 	can_shoot = true
+
+
+func _on_multishot_changed(_tier: int, _shots_until_ready: int, available: bool) -> void:
+	# Don't auto-trigger - wait for player to shoot first
+	pass
+
+
+func _on_multishot_triggered(salvo_size: int) -> void:
+	# Disable normal shooting during multishot
+	can_shoot = false
+
+	print("[Dart] Multishot salvo started: ", salvo_size, " shots")
+
+	# Fire the first shot immediately
+	var mouse_pos = get_viewport().get_mouse_position()
+	_start_throw_to_multishot(mouse_pos)
+	GameState.multishot_remaining_shots -= 1
+	GameState.multishot_changed.emit(GameState.multishot_tier, GameState.multishot_shots_until_ready, GameState.multishot_available)
+
+	# Start the timer for remaining shots
+	if GameState.multishot_remaining_shots > 0:
+		multishot_timer.start()
+	else:
+		# Only 1 shot in salvo, finish immediately
+		GameState.finish_multishot()
+		can_shoot = true
+		_update_sprite_visibility()
+
+
+func _on_multishot_timer_timeout() -> void:
+	# Check if we still have shots to fire
+	if GameState.multishot_remaining_shots > 0:
+		# Get current mouse position and fire at it
+		var mouse_pos = get_viewport().get_mouse_position()
+		_start_throw_to_multishot(mouse_pos)
+
+		# Decrement remaining shots and emit signal to update UI
+		GameState.multishot_remaining_shots -= 1
+		GameState.multishot_changed.emit(GameState.multishot_tier, GameState.multishot_shots_until_ready, GameState.multishot_available)
+
+		print("[Dart] Multishot: ", GameState.multishot_remaining_shots, " shots remaining")
+	else:
+		# Salvo complete, stop timer and restore normal shooting
+		multishot_timer.stop()
+		GameState.finish_multishot()
+		can_shoot = true
+		# Show dart sprites again
+		_update_sprite_visibility()
+		print("[Dart] Multishot salvo complete")
+
+
+func _start_throw_to_multishot(mouse_pos: Vector2) -> void:
+	# This is called during multishot - bypasses can_shoot check
+	# and doesn't consume player darts (handled by GameState)
+
+	# Consume a dart (GameState handles not consuming player darts)
+	GameState.throw_dart()
+
+	# Record shot start time
+	shot_start_time = Time.get_ticks_msec() / 1000.0
+
+	var start_tip: Vector2 = _get_dart_tip_position()
+	var controls := _compute_bezier_controls(start_tip, mouse_pos)
+	var p0: Vector2 = controls[0]
+	var p1: Vector2 = controls[1]
+	var p2: Vector2 = controls[2]
+	var p3: Vector2 = controls[3]
+	var proj: Node2D = _make_projectile_sprite()
+	add_child(proj)
+	proj.global_position = start_tip
+	# Store initial rotation for interpolation
+	var initial_rotation: float = proj.rotation
+	proj.set_meta("initial_rotation", initial_rotation)
+
+	# Keep dart sprites hidden during multishot (don't toggle is_throwing for multishot)
+	sprite_left.visible = false
+	sprite_center.visible = false
+	sprite_right.visible = false
+	trajectory_line.visible = false
+
+	var tween := create_tween()
+	var cb := Callable(self, "_update_projectile_along_bezier").bind(proj, p0, p1, p2, p3)
+	tween.tween_method(cb, 0.0, 1.0, projectile_duration)
+	tween.finished.connect(func():
+		var landing_pos := Vector2.ZERO
+		if is_instance_valid(proj):
+			landing_pos = proj.global_position
+			proj.queue_free()
+		# Print shot duration
+		var shot_end_time: float = Time.get_ticks_msec() / 1000.0
+		var shot_duration: float = shot_end_time - shot_start_time
+		print("Shot duration: %.3f seconds" % shot_duration)
+		# Signal that the dart has landed with position
+		GameState.land_dart(landing_pos)
+	)
