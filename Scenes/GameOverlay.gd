@@ -11,6 +11,8 @@ extends CanvasLayer
 @onready var malus_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/MalusPanel
 @onready var malus_container: VBoxContainer = $MarginContainer/LayoutContainer/LeftPanel/MalusPanel/MalusVBox/MalusEffectsList
 @onready var zoom_help_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/ZoomHelpPanel
+@onready var time_freeze_help_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/TimeFreezeHelpPanel
+@onready var time_freeze_help_label: Label = $MarginContainer/LayoutContainer/LeftPanel/TimeFreezeHelpPanel/TimeFreezeHelpVBox/TimeFreezeHelpLabel
 
 # Dart icon references for updating
 var dart_icons: Array[TextureRect] = []
@@ -28,6 +30,7 @@ func _ready() -> void:
 	GameState.darts_changed.connect(_on_darts_changed)
 	GameState.card_acquired.connect(_on_card_acquired)
 	GameState.zoom_bonus_acquired.connect(_on_zoom_bonus_acquired)
+	GameState.time_freeze_changed.connect(_on_time_freeze_changed)
 	GameState.countries_loaded.connect(_on_countries_loaded)
 
 	# Initialize countries list with any already collected countries
@@ -184,3 +187,16 @@ func _update_country_title() -> void:
 	if total < 179:
 		total = 179  # Hardcoded total while map is loading
 	countries_title.text = "COUNTRIES (%d/%d)" % [collected, total]
+
+
+func _on_time_freeze_changed(tier: int, shots_until_ready: int, available: bool) -> void:
+	"""Show/hide the time freeze help panel and update counter"""
+	# Show help panel only if time freeze is acquired (tier > 0)
+	time_freeze_help_panel.visible = (tier > 0)
+
+	if tier > 0:
+		# Update label text based on availability
+		if available:
+			time_freeze_help_label.text = "⏸ TIME FREEZE UNLOCKED\n\nPress ENTER to freeze (READY!)"
+		else:
+			time_freeze_help_label.text = "⏸ TIME FREEZE UNLOCKED\n\nPress ENTER to freeze\n(Ready in %d shot%s)" % [shots_until_ready, "s" if shots_until_ready != 1 else ""]

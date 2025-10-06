@@ -97,6 +97,7 @@ func _ready() -> void:
 	GameState.globe_scale_changed.connect(_on_globe_scale_changed)
 	GameState.vertical_drift_changed.connect(_on_vertical_drift_changed)
 	GameState.direction_chaos_changed.connect(_on_direction_chaos_changed)
+	GameState.time_freeze_changed.connect(_on_time_freeze_changed)
 
 	# Initialize scroll speed, globe scale, vertical drift, and direction chaos with current values
 	_update_scroll_speed()
@@ -117,6 +118,9 @@ func _on_dart_thrown() -> void:
 
 
 func _on_dart_landed() -> void:
+	# Unfreeze time when dart lands
+	GameState.unfreeze_time()
+
 	# Collect the pending country when dart lands
 	if GameState.pending_country != "":
 		# Check if the country is already collected (for dart refund)
@@ -268,8 +272,8 @@ func _rebuild_map_copy() -> void:
 	print("[RotatingMap] Rebuilt ", sprite_count, " sprite copies")
 
 func _process(delta: float) -> void:
-	# Don't update if paused
-	if is_paused:
+	# Don't update if paused or time is frozen
+	if is_paused or GameState.is_time_frozen:
 		return
 
 	# Handle direction chaos - randomly flip rotation direction
@@ -309,6 +313,12 @@ func _process(delta: float) -> void:
 		world_scroller.position.y = base_y
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Handle Enter key for time freeze
+	if event is InputEventKey:
+		if event.keycode == KEY_ENTER and event.pressed and not event.echo:
+			if GameState.time_freeze_tier > 0 and GameState.time_freeze_available:
+				GameState.use_time_freeze()
+
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			var vp := get_viewport()
 			var img: Image = vp.get_texture().get_image()  # CPU readback of the rendered frame
@@ -395,3 +405,9 @@ func _update_direction_chaos() -> void:
 	if direction_chaos_frequency > 0.0:
 		direction_chaos_next_change_time = 1.0 / direction_chaos_frequency
 	print("[RotatingMap] Direction chaos frequency updated to: ", direction_chaos_frequency)
+
+
+func _on_time_freeze_changed(_tier: int, _shots_until_ready: int, _available: bool) -> void:
+	"""Handle time freeze changes from GameState"""
+	# Nothing needed here, we check GameState.is_time_frozen directly in _process
+	pass

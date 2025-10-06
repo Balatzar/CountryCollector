@@ -171,6 +171,56 @@ const BONUS_DART_REFUND = {
 	"repeatable": false
 }
 
+const BONUS_TIME_FREEZE_T1 = {
+	"id": "time_freeze_t1",
+	"type": PowerUpType.BONUS,
+	"name": "Time Freeze I",
+	"description": "Press ENTER to freeze rotation (every 10 shots)",
+	"family": "time_freeze",
+	"tier": 1,
+	"repeatable": false
+}
+
+const BONUS_TIME_FREEZE_T2 = {
+	"id": "time_freeze_t2",
+	"type": PowerUpType.BONUS,
+	"name": "Time Freeze II",
+	"description": "Press ENTER to freeze rotation (every 9 shots)",
+	"family": "time_freeze",
+	"tier": 2,
+	"repeatable": false
+}
+
+const BONUS_TIME_FREEZE_T3 = {
+	"id": "time_freeze_t3",
+	"type": PowerUpType.BONUS,
+	"name": "Time Freeze III",
+	"description": "Press ENTER to freeze rotation (every 8 shots)",
+	"family": "time_freeze",
+	"tier": 3,
+	"repeatable": false
+}
+
+const BONUS_TIME_FREEZE_T4 = {
+	"id": "time_freeze_t4",
+	"type": PowerUpType.BONUS,
+	"name": "Time Freeze IV",
+	"description": "Press ENTER to freeze rotation (every 7 shots)",
+	"family": "time_freeze",
+	"tier": 4,
+	"repeatable": false
+}
+
+const BONUS_TIME_FREEZE_T5 = {
+	"id": "time_freeze_t5",
+	"type": PowerUpType.BONUS,
+	"name": "Time Freeze V",
+	"description": "Press ENTER to freeze rotation (every 6 shots)",
+	"family": "time_freeze",
+	"tier": 5,
+	"repeatable": false
+}
+
 # ===== MALUSES =====
 
 const MALUS_FASTER_MAP_T1 = {
@@ -392,7 +442,12 @@ const ALL_BONUSES = [
 	BONUS_EXTRA_XP_T3,
 	BONUS_EXTRA_XP_T4,
 	BONUS_EXTRA_XP_T5,
-	BONUS_DART_REFUND
+	BONUS_DART_REFUND,
+	BONUS_TIME_FREEZE_T1,
+	BONUS_TIME_FREEZE_T2,
+	BONUS_TIME_FREEZE_T3,
+	BONUS_TIME_FREEZE_T4,
+	BONUS_TIME_FREEZE_T5
 ]
 
 # All maluses available for selection

@@ -21,6 +21,7 @@ signal globe_scale_changed(multiplier: float)
 signal zoom_bonus_acquired(zoom_level: int)
 signal vertical_drift_changed(amplitude: float)
 signal direction_chaos_changed(frequency: float)
+signal time_freeze_changed(tier: int, shots_until_ready: int, available: bool)
 signal game_over()
 
 # List of all countries in the game
@@ -62,6 +63,12 @@ var extra_xp_bonus_tier: int = 0  # Track highest extra XP bonus tier (0-5)
 
 # Dart refund tracking
 var has_dart_refund: bool = false  # Track if dart refund power-up is acquired
+
+# Time freeze tracking
+var time_freeze_tier: int = 0  # Track highest time freeze bonus tier (0-5)
+var time_freeze_available: bool = false  # Track if power is ready to use
+var time_freeze_shots_until_ready: int = 0  # Counter for shots remaining until ready
+var is_time_frozen: bool = false  # Track if time is currently frozen
 
 # Loading state
 var loading_in_progress: bool = false
@@ -211,6 +218,15 @@ func throw_dart() -> void:
 		dart_thrown.emit()
 		darts_changed.emit(remaining_darts)
 
+		# Update time freeze cooldown if power-up is acquired
+		if time_freeze_tier > 0 and not time_freeze_available:
+			time_freeze_shots_until_ready -= 1
+			if time_freeze_shots_until_ready <= 0:
+				time_freeze_available = true
+				time_freeze_shots_until_ready = 0
+				print("[GameState] Time freeze ready!")
+			time_freeze_changed.emit(time_freeze_tier, time_freeze_shots_until_ready, time_freeze_available)
+
 		# Check for game over
 		if remaining_darts == 0:
 			game_over.emit()
@@ -253,6 +269,10 @@ func reset() -> void:
 	direction_chaos_tier = 0
 	extra_xp_bonus_tier = 0
 	has_dart_refund = false
+	time_freeze_tier = 0
+	time_freeze_available = false
+	time_freeze_shots_until_ready = 0
+	is_time_frozen = false
 	darts_changed.emit(remaining_darts)
 	xp_changed.emit(xp, level)
 
@@ -366,6 +386,26 @@ func acquire_card(card_data: Dictionary) -> void:
 		# Enable dart refund
 		has_dart_refund = true
 		print("[GameState] Dart refund enabled")
+	elif card_id.begins_with("time_freeze_"):
+		# Update time freeze tier (keep highest acquired)
+		if card_id == "time_freeze_t1":
+			time_freeze_tier = max(time_freeze_tier, 1)
+		elif card_id == "time_freeze_t2":
+			time_freeze_tier = max(time_freeze_tier, 2)
+		elif card_id == "time_freeze_t3":
+			time_freeze_tier = max(time_freeze_tier, 3)
+		elif card_id == "time_freeze_t4":
+			time_freeze_tier = max(time_freeze_tier, 4)
+		elif card_id == "time_freeze_t5":
+			time_freeze_tier = max(time_freeze_tier, 5)
+
+		# Initialize cooldown and make it available immediately for first acquisition
+		time_freeze_available = true
+		time_freeze_shots_until_ready = 0
+
+		# Emit signal to update UI
+		time_freeze_changed.emit(time_freeze_tier, time_freeze_shots_until_ready, time_freeze_available)
+		print("[GameState] Time freeze tier updated: ", time_freeze_tier, " (cooldown: ", get_time_freeze_cooldown(), " shots)")
 
 
 # Check if a specific card has been acquired
@@ -506,6 +546,44 @@ func get_extra_xp_bonus() -> int:
 			return 25
 		_:
 			return 0
+
+
+# Get the time freeze cooldown (shots needed) based on tier
+func get_time_freeze_cooldown() -> int:
+	match time_freeze_tier:
+		1:
+			return 10
+		2:
+			return 9
+		3:
+			return 8
+		4:
+			return 7
+		5:
+			return 6
+		_:
+			return 0
+
+
+# Use the time freeze ability
+func use_time_freeze() -> void:
+	if not time_freeze_available or time_freeze_tier == 0:
+		return
+
+	is_time_frozen = true
+	time_freeze_available = false
+	time_freeze_shots_until_ready = get_time_freeze_cooldown()
+
+	# Emit signal to update UI
+	time_freeze_changed.emit(time_freeze_tier, time_freeze_shots_until_ready, time_freeze_available)
+	print("[GameState] Time freeze activated! Next available in ", time_freeze_shots_until_ready, " shots")
+
+
+# Unfreeze time (called when dart lands)
+func unfreeze_time() -> void:
+	if is_time_frozen:
+		is_time_frozen = false
+		print("[GameState] Time unfrozen")
 
 
 # Update the net zoom level based on zoom bonus and unzoom malus tiers
