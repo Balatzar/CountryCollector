@@ -94,7 +94,7 @@ func _ready() -> void:
 
 	# Create multishot timer
 	multishot_timer = Timer.new()
-	multishot_timer.wait_time = 0.2  # Rapid fire rate (200ms between shots)
+	multishot_timer.wait_time = 0.4  # Rapid fire rate (400ms between shots)
 	multishot_timer.one_shot = false
 	multishot_timer.timeout.connect(_on_multishot_timer_timeout)
 	add_child(multishot_timer)
