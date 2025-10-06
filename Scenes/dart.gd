@@ -53,6 +53,7 @@ var fixed_y: float = 0.0
 # Shot timing
 var shot_start_time: float = 0.0
 var is_throwing: bool = false
+var can_shoot: bool = false  # Whether the dart is allowed to be shot
 
 func _ready() -> void:
 	# Calculate fixed Y position (bottom of screen)
@@ -79,6 +80,10 @@ func _ready() -> void:
 
 	# Start with right sprite visible
 	_update_sprite_visibility()
+
+	# Connect to loading signals to control shooting
+	GameState.loading_started.connect(_on_loading_started)
+	GameState.countries_loaded.connect(_on_loading_complete)
 
 func _process(_delta: float) -> void:
 	# Get mouse position
@@ -247,6 +252,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_start_throw_to((event as InputEventMouseButton).position)
 
 func _start_throw_to(mouse_pos: Vector2) -> void:
+	# Check if shooting is allowed
+	if not can_shoot:
+		return
+
 	# Check if player has darts remaining
 	if not GameState.has_darts():
 		print("No darts remaining!")
@@ -398,3 +407,13 @@ func _compute_bezier_controls(start: Vector2, end: Vector2) -> Array[Vector2]:
 	var p1: Vector2 = p0 + n * len_start + dir * f_start
 	var p2: Vector2 = p3 - dir * f_end - n * len_end
 	return [p0, p1, p2, p3]
+
+
+func _on_loading_started(_total: int) -> void:
+	# Disable shooting during loading
+	can_shoot = false
+
+
+func _on_loading_complete() -> void:
+	# Enable shooting once loading is complete
+	can_shoot = true
