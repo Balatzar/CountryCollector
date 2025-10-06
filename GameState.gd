@@ -52,6 +52,9 @@ var unzoom_malus_tier: int = 0  # Track highest unzoom malus tier acquired (0-3)
 # Vertical drift tracking
 var vertical_drift_tier: int = 0  # Track highest vertical movement malus tier (0-3)
 
+# Extra XP bonus tracking
+var extra_xp_bonus_tier: int = 0  # Track highest extra XP bonus tier (0-3)
+
 # Loading state
 var loading_in_progress: bool = false
 var countries_loaded_count: int = 0
@@ -127,6 +130,11 @@ func collect_country(country_id: String) -> void:
 		# Award XP based on country size
 		var country_size = CountryNames.get_country_size(country_id)
 		var xp_reward = XP_REWARDS.get(country_size, 100)
+
+		# Add extra XP bonus if acquired
+		var extra_xp = get_extra_xp_bonus()
+		xp_reward += extra_xp
+
 		add_xp(xp_reward)
 
 		country_collected.emit(country_id)
@@ -220,6 +228,7 @@ func reset() -> void:
 	unzoom_malus_tier = 0
 	current_zoom_level = 0
 	vertical_drift_tier = 0
+	extra_xp_bonus_tier = 0
 	darts_changed.emit(remaining_darts)
 	xp_changed.emit(xp, level)
 
@@ -287,6 +296,15 @@ func acquire_card(card_data: Dictionary) -> void:
 		var new_multiplier = get_globe_scale_multiplier()
 		globe_scale_changed.emit(new_multiplier)
 		print("[GameState] Globe scale multiplier updated: ", new_multiplier)
+	elif card_id.begins_with("extra_xp_"):
+		# Update extra XP bonus tier (keep highest acquired)
+		if card_id == "extra_xp_t1":
+			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 1)
+		elif card_id == "extra_xp_t2":
+			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 2)
+		elif card_id == "extra_xp_t3":
+			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 3)
+		print("[GameState] Extra XP bonus tier updated: ", extra_xp_bonus_tier)
 
 
 # Check if a specific card has been acquired
@@ -376,6 +394,19 @@ func get_vertical_drift_amplitude() -> float:
 			return 60.0  # ±60px
 		_:
 			return 0.0  # No drift
+
+
+# Get the extra XP bonus per successful hit based on acquired bonuses
+func get_extra_xp_bonus() -> int:
+	match extra_xp_bonus_tier:
+		1:
+			return 5
+		2:
+			return 10
+		3:
+			return 15
+		_:
+			return 0
 
 
 # Update the net zoom level based on zoom bonus and unzoom malus tiers

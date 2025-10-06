@@ -154,7 +154,9 @@ func _on_country_collected(country_id: String) -> void:
 	# Wait another 100ms before showing XP reward
 	await get_tree().create_timer(0.1).timeout
 	var xp_reward := GameState.get_xp_reward_for_country(country_id)
-	GameState.show_notification("+" + str(xp_reward) + " XP", GameState.last_dart_position, COLOR_XP)
+	var extra_xp := GameState.get_extra_xp_bonus()
+	var total_xp := xp_reward + extra_xp
+	GameState.show_notification("+" + str(total_xp) + " XP", GameState.last_dart_position, COLOR_XP)
 
 	# Wait another 100ms before showing fun success message
 	await get_tree().create_timer(0.1).timeout

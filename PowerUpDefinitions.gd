@@ -71,6 +71,36 @@ const BONUS_ZOOM_T3 = {
 	"repeatable": false
 }
 
+const BONUS_EXTRA_XP_T1 = {
+	"id": "extra_xp_t1",
+	"type": PowerUpType.BONUS,
+	"name": "Extra XP I",
+	"description": "+5 XP per successful hit",
+	"family": "extra_xp",
+	"tier": 1,
+	"repeatable": false
+}
+
+const BONUS_EXTRA_XP_T2 = {
+	"id": "extra_xp_t2",
+	"type": PowerUpType.BONUS,
+	"name": "Extra XP II",
+	"description": "+10 XP per successful hit",
+	"family": "extra_xp",
+	"tier": 2,
+	"repeatable": false
+}
+
+const BONUS_EXTRA_XP_T3 = {
+	"id": "extra_xp_t3",
+	"type": PowerUpType.BONUS,
+	"name": "Extra XP III",
+	"description": "+15 XP per successful hit",
+	"family": "extra_xp",
+	"tier": 3,
+	"repeatable": false
+}
+
 # ===== MALUSES =====
 
 const MALUS_FASTER_MAP_T1 = {
@@ -172,7 +202,10 @@ const ALL_BONUSES = [
 	BONUS_SLOWER_MAP_T3,
 	BONUS_ZOOM_T1,
 	BONUS_ZOOM_T2,
-	BONUS_ZOOM_T3
+	BONUS_ZOOM_T3,
+	BONUS_EXTRA_XP_T1,
+	BONUS_EXTRA_XP_T2,
+	BONUS_EXTRA_XP_T3
 ]
 
 # All maluses available for selection

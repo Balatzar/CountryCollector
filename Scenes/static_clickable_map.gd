@@ -105,7 +105,7 @@ func _load_countries():
 		print("[StaticMap] Directory access failed, using hardcoded country list")
 		country_list = COUNTRIES
 	# # TODO REMOVE
-	# country_list = country_list.slice(0, 60)
+	country_list = country_list.slice(0, 60)
 
 	print("[StaticMap] Found ", country_list.size(), " countries")
 
