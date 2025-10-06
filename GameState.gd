@@ -23,6 +23,8 @@ signal vertical_drift_changed(amplitude: float)
 signal direction_chaos_changed(frequency: float)
 signal time_freeze_changed(tier: int, shots_until_ready: int, available: bool)
 signal game_over()
+signal streak_started(streak_count: int)
+signal streak_ended(final_count: int)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -69,6 +71,11 @@ var time_freeze_tier: int = 0  # Track highest time freeze bonus tier (0-5)
 var time_freeze_available: bool = false  # Track if power is ready to use
 var time_freeze_shots_until_ready: int = 0  # Counter for shots remaining until ready
 var is_time_frozen: bool = false  # Track if time is currently frozen
+
+# Streak tracking
+const STREAK_THRESHOLD: int = 3  # Number of consecutive hits needed to activate streak
+var current_streak: int = 0  # Current consecutive hit count
+var is_on_streak: bool = false  # Whether streak mode is active
 
 # Loading state
 var loading_in_progress: bool = false
@@ -273,6 +280,8 @@ func reset() -> void:
 	time_freeze_available = false
 	time_freeze_shots_until_ready = 0
 	is_time_frozen = false
+	current_streak = 0
+	is_on_streak = false
 	darts_changed.emit(remaining_darts)
 	xp_changed.emit(xp, level)
 
