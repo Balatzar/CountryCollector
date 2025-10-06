@@ -118,49 +118,23 @@ func _on_card_acquired(_card_data: Dictionary) -> void:
 
 
 func _update_card_displays() -> void:
-	"""Update the bonus and malus containers based on acquired cards"""
+	"""Update the bonus and malus containers showing only highest tier per family"""
 	# Clear existing content
 	_clear_container(bonus_container)
 	_clear_container(malus_container)
 
-	# Get all acquired cards from GameState
-	var acquired_cards := GameState.get_acquired_cards()
+	# Ask GameState for highest-tier power-ups per family
+	var grouped := GameState.get_active_powerups_by_family()
 
-	# Collect all bonuses and maluses from all power-ups
-	var all_bonuses: Array[String] = []
-	var all_maluses: Array[String] = []
-
-	for power_up in acquired_cards:
-		# Check if this is a new-style power-up (has "type" field)
-		if power_up.has("type"):
-			var power_up_desc: String = power_up.get("description", "Unknown")
-			var power_up_type: int = power_up.get("type", 0)
-
-			# PowerUpDefinitions.PowerUpType enum: BONUS = 0, MALUS = 1
-			if power_up_type == 0:  # BONUS
-				all_bonuses.append(power_up_desc)
-			else:  # MALUS
-				all_maluses.append(power_up_desc)
-		else:
-			# Legacy format: card with bonuses/maluses arrays
-			var bonuses: Array = power_up.get("bonuses", [])
-			var maluses: Array = power_up.get("maluses", [])
-
-			for bonus in bonuses:
-				all_bonuses.append(str(bonus))
-
-			for malus in maluses:
-				all_maluses.append(str(malus))
-
-	# Populate bonus container
-	if all_bonuses.size() > 0:
-		for bonus_text in all_bonuses:
+	# Populate bonus container (highest per family)
+	if grouped.has("bonuses") and grouped["bonuses"].size() > 0:
+		for p in grouped["bonuses"]:
 			var label := Label.new()
-			label.text = bonus_text
+			label.text = String(p.get("description", p.get("name", "Unknown")))
 			label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.5))  # Green
 			label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 			label.add_theme_constant_override("outline_size", 4)
-			label.add_theme_font_size_override("font_size", 24)  # Bigger text (was 18)
+			label.add_theme_font_size_override("font_size", 24)
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			bonus_container.add_child(label)
@@ -168,15 +142,15 @@ func _update_card_displays() -> void:
 	else:
 		bonus_panel.visible = false
 
-	# Populate malus container
-	if all_maluses.size() > 0:
-		for malus_text in all_maluses:
+	# Populate malus container (highest per family)
+	if grouped.has("maluses") and grouped["maluses"].size() > 0:
+		for p in grouped["maluses"]:
 			var label := Label.new()
-			label.text = malus_text
+			label.text = String(p.get("description", p.get("name", "Unknown")))
 			label.add_theme_color_override("font_color", Color(1.0, 0.3, 0.3))  # Red
 			label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 			label.add_theme_constant_override("outline_size", 4)
-			label.add_theme_font_size_override("font_size", 24)  # Bigger text (was 18)
+			label.add_theme_font_size_override("font_size", 24)
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			malus_container.add_child(label)

@@ -16,6 +16,7 @@ const BONUS_SLOWER_MAP_T1 = {
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map I",
 	"description": "Map rotation speed reduced by 15%",
+	"family": "slower_map",
 	"tier": 1,
 	"repeatable": false
 }
@@ -25,6 +26,7 @@ const BONUS_SLOWER_MAP_T2 = {
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map II",
 	"description": "Map rotation speed reduced by 30%",
+	"family": "slower_map",
 	"tier": 2,
 	"repeatable": false
 }
@@ -34,6 +36,7 @@ const BONUS_SLOWER_MAP_T3 = {
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map III",
 	"description": "Map rotation speed reduced by 50%",
+	"family": "slower_map",
 	"tier": 3,
 	"repeatable": false
 }
@@ -43,6 +46,7 @@ const BONUS_ZOOM_T1 = {
 	"type": PowerUpType.BONUS,
 	"name": "Zoom I",
 	"description": "Unlock map zoom capability (1.5x)",
+	"family": "zoom",
 	"tier": 1,
 	"repeatable": false
 }
@@ -52,6 +56,7 @@ const BONUS_ZOOM_T2 = {
 	"type": PowerUpType.BONUS,
 	"name": "Zoom II",
 	"description": "Improved map zoom (2.0x)",
+	"family": "zoom",
 	"tier": 2,
 	"repeatable": false
 }
@@ -61,6 +66,7 @@ const BONUS_ZOOM_T3 = {
 	"type": PowerUpType.BONUS,
 	"name": "Zoom III",
 	"description": "Maximum map zoom (3.0x)",
+	"family": "zoom",
 	"tier": 3,
 	"repeatable": false
 }
@@ -72,6 +78,7 @@ const MALUS_FASTER_MAP_T1 = {
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map I",
 	"description": "Map rotation speed increased by 20%",
+	"family": "faster_map",
 	"tier": 1,
 	"repeatable": false
 }
@@ -81,6 +88,7 @@ const MALUS_FASTER_MAP_T2 = {
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map II",
 	"description": "Map rotation speed increased by 40%",
+	"family": "faster_map",
 	"tier": 2,
 	"repeatable": false
 }
@@ -90,6 +98,7 @@ const MALUS_FASTER_MAP_T3 = {
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map III",
 	"description": "Map rotation speed increased by 60%",
+	"family": "faster_map",
 	"tier": 3,
 	"repeatable": false
 }
@@ -99,6 +108,7 @@ const MALUS_UNZOOM_T1 = {
 	"type": PowerUpType.MALUS,
 	"name": "Unzoom I",
 	"description": "Map zoom reduced by 15%",
+	"family": "zoom",
 	"tier": 1,
 	"repeatable": false
 }
@@ -108,6 +118,7 @@ const MALUS_UNZOOM_T2 = {
 	"type": PowerUpType.MALUS,
 	"name": "Unzoom II",
 	"description": "Map zoom reduced by 30%",
+	"family": "zoom",
 	"tier": 2,
 	"repeatable": false
 }
@@ -117,6 +128,7 @@ const MALUS_UNZOOM_T3 = {
 	"type": PowerUpType.MALUS,
 	"name": "Unzoom III",
 	"description": "Map zoom reduced by 50%",
+	"family": "zoom",
 	"tier": 3,
 	"repeatable": false
 }
@@ -126,6 +138,7 @@ const MALUS_VERTICAL_MOVEMENT_T1 = {
 	"type": PowerUpType.MALUS,
 	"name": "Vertical Drift I",
 	"description": "Map slowly drifts up and down",
+	"family": "vertical_movement",
 	"tier": 1,
 	"repeatable": false
 }
@@ -135,6 +148,7 @@ const MALUS_VERTICAL_MOVEMENT_T2 = {
 	"type": PowerUpType.MALUS,
 	"name": "Vertical Drift II",
 	"description": "Map drifts up and down",
+	"family": "vertical_movement",
 	"tier": 2,
 	"repeatable": false
 }
@@ -144,6 +158,7 @@ const MALUS_VERTICAL_MOVEMENT_T3 = {
 	"type": PowerUpType.MALUS,
 	"name": "Vertical Drift III",
 	"description": "Map heavily drifts up and down",
+	"family": "vertical_movement",
 	"tier": 3,
 	"repeatable": false
 }

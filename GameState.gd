@@ -243,26 +243,26 @@ func acquire_card(card_data: Dictionary) -> void:
 		rotation_speed_changed.emit(new_multiplier)
 		print("[GameState] Rotation speed multiplier updated: ", new_multiplier)
 	elif card_id.begins_with("vertical_movement_"):
-		# Update vertical drift tier
+		# Update vertical drift tier (keep highest acquired)
 		if card_id == "vertical_movement_t1":
-			vertical_drift_tier = 1
+			vertical_drift_tier = max(vertical_drift_tier, 1)
 		elif card_id == "vertical_movement_t2":
-			vertical_drift_tier = 2
+			vertical_drift_tier = max(vertical_drift_tier, 2)
 		elif card_id == "vertical_movement_t3":
-			vertical_drift_tier = 3
+			vertical_drift_tier = max(vertical_drift_tier, 3)
 
 		# Emit signal with new drift amplitude
 		var amplitude = get_vertical_drift_amplitude()
 		vertical_drift_changed.emit(amplitude)
 		print("[GameState] Vertical drift amplitude updated: ", amplitude)
 	elif card_id.begins_with("unzoom_"):
-		# Update unzoom malus tier
+		# Update unzoom malus tier (keep highest acquired)
 		if card_id == "unzoom_t1":
-			unzoom_malus_tier = 1
+			unzoom_malus_tier = max(unzoom_malus_tier, 1)
 		elif card_id == "unzoom_t2":
-			unzoom_malus_tier = 2
+			unzoom_malus_tier = max(unzoom_malus_tier, 2)
 		elif card_id == "unzoom_t3":
-			unzoom_malus_tier = 3
+			unzoom_malus_tier = max(unzoom_malus_tier, 3)
 
 		# Recalculate net zoom level (zoom bonus - unzoom malus)
 		_update_net_zoom_level()
@@ -272,13 +272,13 @@ func acquire_card(card_data: Dictionary) -> void:
 		globe_scale_changed.emit(new_multiplier)
 		print("[GameState] Globe scale multiplier updated: ", new_multiplier)
 	elif card_id.begins_with("zoom_"):
-		# Update zoom bonus tier
+		# Update zoom bonus tier (keep highest acquired)
 		if card_id == "zoom_t1":
-			zoom_bonus_tier = 1
+			zoom_bonus_tier = max(zoom_bonus_tier, 1)
 		elif card_id == "zoom_t2":
-			zoom_bonus_tier = 2
+			zoom_bonus_tier = max(zoom_bonus_tier, 2)
 		elif card_id == "zoom_t3":
-			zoom_bonus_tier = 3
+			zoom_bonus_tier = max(zoom_bonus_tier, 3)
 
 		# Recalculate net zoom level (zoom bonus - unzoom malus)
 		_update_net_zoom_level()
@@ -301,6 +301,26 @@ func has_card(card_name: String) -> bool:
 func get_acquired_cards() -> Array[Dictionary]:
 	return acquired_cards.duplicate()
 
+
+
+# Return highest-tier active power-ups per family, split by type
+func get_active_powerups_by_family() -> Dictionary:
+	var best := {}
+	for p in acquired_cards:
+		if not (p.has("family") and p.has("tier")):
+			continue
+		var fam := String(p["family"])
+		var current_best = best.get(fam, null)
+		if current_best == null or int(p.get("tier", 0)) > int(current_best.get("tier", 0)):
+			best[fam] = p
+	var out := {"bonuses": [], "maluses": []}
+	for v in best.values():
+		var t := int(v.get("type", 0))
+		if t == PowerUpDefinitions.PowerUpType.BONUS:
+			out["bonuses"].append(v)
+		else:
+			out["maluses"].append(v)
+	return out
 
 # Get the current rotation speed multiplier based on acquired cards
 func get_rotation_speed_multiplier() -> float:
