@@ -362,6 +362,88 @@ func _process(delta: float) -> void:
 	else:
 		world_scroller.position.y = base_y
 
+func _sample_colors_in_radius(img: Image, center: Vector2i, radius: int) -> Array[Color]:
+	"""Sample colors in a circular pattern around a center point"""
+	var colors: Array[Color] = []
+	var img_width = img.get_width()
+	var img_height = img.get_height()
+
+	# Sample in a circle around the center point
+	for y in range(-radius, radius + 1):
+		for x in range(-radius, radius + 1):
+			# Check if point is within circle
+			if x * x + y * y <= radius * radius:
+				var px = center + Vector2i(x, y)
+				# Check bounds
+				if px.x >= 0 and px.y >= 0 and px.x < img_width and px.y < img_height:
+					colors.append(img.get_pixelv(px))
+
+	return colors
+
+
+func _normalize_color(color: Color, quantize_steps: int = 16) -> Color:
+	"""Quantize color values to reduce anti-aliasing gradient variations"""
+	var step_size = 1.0 / float(quantize_steps)
+	var normalized = Color(
+		round(color.r / step_size) * step_size,
+		round(color.g / step_size) * step_size,
+		round(color.b / step_size) * step_size,
+		1.0
+	)
+	return normalized
+
+
+func _get_most_frequent_color(colors: Array[Color], tolerance: float = 0.015) -> Color:
+	"""Find the most frequent color in an array, ignoring dark/background colors"""
+	if colors.is_empty():
+		print("[ColorSampling] No colors to analyze")
+		return Color.BLACK
+
+	# Dictionary to store color counts
+	# Key is normalized color string, value is [count, original_color, normalized_color]
+	var color_counts: Dictionary = {}
+	var total_samples = colors.size()
+	var ignored_count = 0
+
+	for color in colors:
+		# Ignore very dark colors (likely background or borders)
+		if color.r < 0.05 and color.g < 0.05 and color.b < 0.05:
+			ignored_count += 1
+			continue
+
+		# Normalize the color to group similar shades together
+		var normalized = _normalize_color(color, 16)  # 16 steps = quantize to 1/16 increments
+		var key = str(normalized)
+
+		if key in color_counts:
+			# Increment count for this normalized color
+			color_counts[key][0] += 1
+		else:
+			# Store: [count, first_sample_color, normalized_color]
+			color_counts[key] = [1, color, normalized]
+
+	# Log sampling results
+	print("[ColorSampling] Total samples: ", total_samples, " | Ignored dark pixels: ", ignored_count, " | Unique colors found: ", color_counts.size())
+
+	# Find the color with the highest count
+	var max_count = 0
+	var most_frequent_color = Color.BLACK
+	var winner_normalized = Color.BLACK
+
+	for key in color_counts.keys():
+		var count = color_counts[key][0]
+		var original_color = color_counts[key][1]
+		var normalized_color = color_counts[key][2]
+		print("[ColorSampling]   Normalized (%.3f, %.3f, %.3f): %d votes (%.1f%%)" % [normalized_color.r, normalized_color.g, normalized_color.b, count, (float(count) / total_samples) * 100.0])
+		if count > max_count:
+			max_count = count
+			most_frequent_color = original_color  # Return original color for better matching
+			winner_normalized = normalized_color
+
+	print("[ColorSampling] Winner: (%.3f, %.3f, %.3f) normalized from original samples, %d votes (%.1f%%)" % [winner_normalized.r, winner_normalized.g, winner_normalized.b, max_count, (float(max_count) / total_samples) * 100.0])
+	return most_frequent_color
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	# Handle Enter key for time freeze
 	if event is InputEventKey:
@@ -388,7 +470,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 			# Clamp to valid pixel range
 			if px.x >= 0 and px.y >= 0 and px.x < img.get_width() and px.y < img.get_height():
-					var color: Color = img.get_pixelv(px)
+					# Sample colors in a circular area around the click point (radius 10 = ~314 pixels sampled)
+					var sampled_colors = _sample_colors_in_radius(img, px, 10)
+					var color: Color = _get_most_frequent_color(sampled_colors)
 
 					# Use a higher tolerance to account for rendering differences
 					var country_id = GameState.get_country_by_color(color, 0.015)
