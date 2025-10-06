@@ -9,7 +9,7 @@ uniform float edge_softness : hint_range(0.0, 0.1) = 0.01;
 uniform float distortion : hint_range(0.0, 1.0) = 0.85;
 
 // Visual polish
-uniform float rim_darkening : hint_range(0.0, 1.0) = 0.2;
+uniform float rim_darkening : hint_range(0.0, 1.0) = 0;
 uniform float rim_softness : hint_range(0.0, 0.5) = 0.1;
 
 // Provide explicit aspect ratio (width / height)

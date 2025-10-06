@@ -8,15 +8,14 @@
 shader = ExtResource("3_shader")
 shader_parameter/radius = 0.48
 shader_parameter/center = Vector2(0.5, 0.5)
-shader_parameter/edge_softness = 0.01
+shader_parameter/edge_softness = 0.0010000000475
 shader_parameter/distortion = 0.85
-shader_parameter/rim_darkening = 0.2
+shader_parameter/rim_darkening = 0.0
 shader_parameter/rim_softness = 0.1
 shader_parameter/tex_aspect = 1.0
 
 [node name="RotatingStaticMap" type="Node2D"]
 script = ExtResource("1_lug42")
-base_scroll_speed = 150.0
 
 [node name="SubViewport" type="SubViewport" parent="."]
 transparent_bg = true
