@@ -29,6 +29,46 @@ const COUNTRIES = [
 # Dictionary to store sprite references by country_id
 var country_sprites: Dictionary = {}
 
+# Generate a random earthy, muted color
+func _generate_earthy_color() -> Color:
+	# Use HSV color space for better control
+	# Expanded hue ranges for more variety:
+	# - Browns/ochres/yellows: 25-60 degrees (0.07-0.167 in 0-1 range)
+	# - Greens: 70-160 degrees (0.19-0.44 in 0-1 range)
+	# - Muted reds/terracotta/oranges: 0-30 degrees (0.0-0.083 in 0-1 range)
+	# - Teal/blue-greens: 160-200 degrees (0.44-0.56 in 0-1 range)
+
+	var hue: float
+	var saturation: float
+	var value: float
+
+	# Randomly choose a color family (now 4 options)
+	var color_family = randi() % 4
+
+	match color_family:
+		0:  # Browns, ochres, and yellows
+			hue = randf_range(0.07, 0.167)
+			saturation = randf_range(0.8, 1)  # Higher saturation
+			value = randf_range(0.4, 0.75)
+		1:  # Greens (wider range)
+			hue = randf_range(0.19, 0.44)
+			saturation = randf_range(0.6, 0.9)  # Higher saturation
+			value = randf_range(0.35, 0.7)
+		2:  # Terracotta, reds, oranges
+			hue = randf_range(0.0, 0.083)
+			saturation = randf_range(0.8, 1)  # Higher saturation
+			value = randf_range(0.45, 0.8)
+		3:  # Teal and blue-greens
+			hue = randf_range(0.44, 0.56)
+			saturation = randf_range(0.4, 0.65)
+			value = randf_range(0.4, 0.7)
+		_:
+			hue = 0.1
+			saturation = 0.5
+			value = 0.5
+
+	return Color.from_hsv(hue, saturation, value, 1.0)
+
 func _ready():
 	_load_countries()
 	# Connect to country collection signal
@@ -64,8 +104,8 @@ func _load_countries():
 		# Directory access failed, use hardcoded list
 		print("[StaticMap] Directory access failed, using hardcoded country list")
 		country_list = COUNTRIES
-	# TODO REMOVE
-	country_list = country_list.slice(0, 60)
+	# # TODO REMOVE
+	# country_list = country_list.slice(0, 60)
 
 	print("[StaticMap] Found ", country_list.size(), " countries")
 
@@ -102,12 +142,12 @@ func _create_country_sprite(country_id: String):
 	# Check if country is already collected
 	var is_collected = GameState.is_collected(country_id)
 
-	# Use white for collected countries, random color otherwise
+	# Use gold for collected countries, random color otherwise
 	var color_to_use: Color
 	if is_collected:
-		color_to_use = Color.WHITE
+		color_to_use = Color.GOLD
 	else:
-		color_to_use = Color(randf(), randf(), randf(), 1.0)
+		color_to_use = _generate_earthy_color()
 
 	# Create a colored texture from the alpha mask
 	var alpha_image = alpha_texture.get_image()
@@ -130,13 +170,13 @@ func _create_country_sprite(country_id: String):
 	# Store sprite reference
 	country_sprites[country_id] = sprite
 
-	# Register color in GameState (only if not collected, white countries don't need color tracking)
+	# Register color in GameState (only if not collected, gold countries don't need color tracking)
 	GameState.add_country(country_id)
 	if not is_collected:
 		GameState.register_country_color(country_id, color_to_use)
 
 func _on_country_collected(country_id: String):
-	# Update the sprite color to white when collected
+	# Update the sprite color to gold when collected
 	if country_id not in country_sprites:
 		return
 
@@ -147,13 +187,14 @@ func _on_country_collected(country_id: String):
 	if alpha_texture == null:
 		return
 
-	# Regenerate texture with white color
+	# Regenerate texture with gold color
 	var alpha_image = alpha_texture.get_image()
-	var white_image = Image.create(alpha_image.get_width(), alpha_image.get_height(), false, Image.FORMAT_RGBA8)
+	var gold_image = Image.create(alpha_image.get_width(), alpha_image.get_height(), false, Image.FORMAT_RGBA8)
+	var gold_color = Color.GOLD
 
 	for y in range(alpha_image.get_height()):
 		for x in range(alpha_image.get_width()):
 			var alpha_value = alpha_image.get_pixel(x, y).a
-			white_image.set_pixel(x, y, Color(1.0, 1.0, 1.0, alpha_value))
+			gold_image.set_pixel(x, y, Color(gold_color.r, gold_color.g, gold_color.b, alpha_value))
 
-	sprite.texture = ImageTexture.create_from_image(white_image)
+	sprite.texture = ImageTexture.create_from_image(gold_image)
