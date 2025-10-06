@@ -19,6 +19,12 @@ extends CanvasLayer
 # Dart icon references for updating
 var dart_icons: Array[TextureRect] = []
 
+# Label for displaying "+X" when there are more than 15 darts
+var dart_overflow_label: Label = null
+
+# Maximum number of dart icons to display
+const MAX_DISPLAYED_DARTS: int = 15
+
 # Reference to CountryNames for displaying full country names
 const CountryNames = preload("res://CountryNames.gd")
 
@@ -52,6 +58,7 @@ func _setup_dart_counter() -> void:
 	for child in dart_container.get_children():
 		child.queue_free()
 	dart_icons.clear()
+	dart_overflow_label = null
 
 	# Load dart textures
 	var dart_full_texture: Texture2D = load("res://Assets/dart_left_up.png")
@@ -60,8 +67,11 @@ func _setup_dart_counter() -> void:
 	# Get current dart count from GameState
 	var remaining := GameState.get_remaining_darts()
 
+	# Determine how many dart icons to display (cap at MAX_DISPLAYED_DARTS)
+	var icons_to_display: int = min(GameState.MAX_DARTS, MAX_DISPLAYED_DARTS)
+
 	# Create dart icons
-	for i in range(GameState.MAX_DARTS):
+	for i in range(icons_to_display):
 		var dart_icon := TextureRect.new()
 		dart_icon.custom_minimum_size = Vector2(32, 32)
 		dart_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
@@ -75,6 +85,19 @@ func _setup_dart_counter() -> void:
 
 		dart_container.add_child(dart_icon)
 		dart_icons.append(dart_icon)
+
+	# Create the overflow label (initially hidden)
+	dart_overflow_label = Label.new()
+	dart_overflow_label.add_theme_font_size_override("font_size", 24)
+	dart_overflow_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0))
+	dart_overflow_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	dart_overflow_label.add_theme_constant_override("outline_size", 4)
+	dart_overflow_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	dart_overflow_label.visible = false
+	dart_container.add_child(dart_overflow_label)
+
+	# Update overflow label visibility and text
+	_update_overflow_label(remaining)
 
 
 
@@ -90,22 +113,44 @@ func _on_darts_changed(remaining_darts: int) -> void:
 	var dart_full_texture: Texture2D = load("res://Assets/dart_left_up.png")
 	var dart_empty_texture: Texture2D = load("res://Assets/dart_left_up_empty.png")
 
-	# If we need more icons than we currently have, add them
-	while dart_icons.size() < remaining_darts:
+	# If we need more icons than we currently have (but cap at MAX_DISPLAYED_DARTS)
+	var needed_icons: int = min(remaining_darts, MAX_DISPLAYED_DARTS)
+	while dart_icons.size() < needed_icons:
 		var dart_icon := TextureRect.new()
 		dart_icon.custom_minimum_size = Vector2(32, 32)
 		dart_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 		dart_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		dart_icon.texture = dart_full_texture
-		dart_container.add_child(dart_icon)
+		# Insert before the overflow label
+		if dart_overflow_label:
+			dart_container.add_child(dart_icon)
+			dart_container.move_child(dart_icon, dart_container.get_child_count() - 2)
+		else:
+			dart_container.add_child(dart_icon)
 		dart_icons.append(dart_icon)
 
-	# Update all existing icons
+	# Update all existing icons (show full for first min(remaining_darts, MAX_DISPLAYED_DARTS))
 	for i in range(dart_icons.size()):
 		if i < remaining_darts:
 			dart_icons[i].texture = dart_full_texture
 		else:
 			dart_icons[i].texture = dart_empty_texture
+
+	# Update overflow label
+	_update_overflow_label(remaining_darts)
+
+
+func _update_overflow_label(remaining_darts: int) -> void:
+	"""Update the overflow label to show +X when there are more than MAX_DISPLAYED_DARTS"""
+	if dart_overflow_label == null:
+		return
+
+	if remaining_darts > MAX_DISPLAYED_DARTS:
+		var overflow_count := remaining_darts - MAX_DISPLAYED_DARTS
+		dart_overflow_label.text = " +%d" % overflow_count
+		dart_overflow_label.visible = true
+	else:
+		dart_overflow_label.visible = false
 
 
 func _add_country_to_list(country_id: String) -> void:
