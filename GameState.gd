@@ -20,6 +20,7 @@ signal rotation_speed_changed(multiplier: float)
 signal globe_scale_changed(multiplier: float)
 signal zoom_bonus_acquired(zoom_level: int)
 signal vertical_drift_changed(amplitude: float)
+signal direction_chaos_changed(frequency: float)
 signal game_over()
 
 # List of all countries in the game
@@ -51,6 +52,9 @@ var unzoom_malus_tier: int = 0  # Track highest unzoom malus tier acquired (0-5)
 
 # Vertical drift tracking
 var vertical_drift_tier: int = 0  # Track highest vertical movement malus tier (0-5)
+
+# Direction chaos tracking
+var direction_chaos_tier: int = 0  # Track highest direction chaos malus tier (0-5)
 
 # Extra XP bonus tracking
 var extra_xp_bonus_tier: int = 0  # Track highest extra XP bonus tier (0-5)
@@ -238,6 +242,7 @@ func reset() -> void:
 	unzoom_malus_tier = 0
 	current_zoom_level = 0
 	vertical_drift_tier = 0
+	direction_chaos_tier = 0
 	extra_xp_bonus_tier = 0
 	has_dart_refund = false
 	darts_changed.emit(remaining_darts)
@@ -279,6 +284,23 @@ func acquire_card(card_data: Dictionary) -> void:
 		var amplitude = get_vertical_drift_amplitude()
 		vertical_drift_changed.emit(amplitude)
 		print("[GameState] Vertical drift amplitude updated: ", amplitude)
+	elif card_id.begins_with("direction_chaos_"):
+		# Update direction chaos tier (keep highest acquired)
+		if card_id == "direction_chaos_t1":
+			direction_chaos_tier = max(direction_chaos_tier, 1)
+		elif card_id == "direction_chaos_t2":
+			direction_chaos_tier = max(direction_chaos_tier, 2)
+		elif card_id == "direction_chaos_t3":
+			direction_chaos_tier = max(direction_chaos_tier, 3)
+		elif card_id == "direction_chaos_t4":
+			direction_chaos_tier = max(direction_chaos_tier, 4)
+		elif card_id == "direction_chaos_t5":
+			direction_chaos_tier = max(direction_chaos_tier, 5)
+
+		# Emit signal with new chaos frequency
+		var frequency = get_direction_chaos_frequency()
+		direction_chaos_changed.emit(frequency)
+		print("[GameState] Direction chaos updated: frequency=", frequency)
 	elif card_id.begins_with("unzoom_"):
 		# Update unzoom malus tier (keep highest acquired)
 		if card_id == "unzoom_t1":
@@ -441,6 +463,24 @@ func get_vertical_drift_amplitude() -> float:
 			return 100.0  # ±100px
 		_:
 			return 0.0  # No drift
+
+
+func get_direction_chaos_frequency() -> float:
+	"""Returns frequency (changes per second) for map rotation direction chaos based on tier
+	The map will randomly flip rotation direction (clockwise <-> counterclockwise)"""
+	match direction_chaos_tier:
+		1:
+			return 0.2  # Flip direction every 5 seconds
+		2:
+			return 0.4  # Flip direction every 2.5 seconds
+		3:
+			return 0.75  # Flip direction every ~1.3 seconds
+		4:
+			return 1.5  # Flip direction every ~0.67 seconds
+		5:
+			return 3.0  # Flip direction every ~0.33 seconds
+		_:
+			return 0.0  # No chaos
 
 
 # Get the extra XP bonus per successful hit based on acquired bonuses

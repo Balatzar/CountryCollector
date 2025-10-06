@@ -14,6 +14,11 @@ var vertical_drift_amplitude: float = 0.0  # Amplitude of vertical oscillation (
 var vertical_drift_time: float = 0.0  # Time accumulator for sine wave
 const VERTICAL_DRIFT_FREQUENCY: float = 0.5  # Oscillations per second (higher = faster)
 
+# Direction chaos parameters
+var direction_chaos_frequency: float = 0.0  # How often to change direction (changes per second)
+var direction_chaos_next_change_time: float = 0.0  # When next direction change occurs
+var direction_multiplier: int = 1  # 1 for normal, -1 for reversed
+
 ## Node references
 @onready var sub_viewport: SubViewport = $SubViewport
 @onready var world_scroller: Node2D = $SubViewport/WorldScroller
@@ -91,11 +96,13 @@ func _ready() -> void:
 	GameState.rotation_speed_changed.connect(_on_rotation_speed_changed)
 	GameState.globe_scale_changed.connect(_on_globe_scale_changed)
 	GameState.vertical_drift_changed.connect(_on_vertical_drift_changed)
+	GameState.direction_chaos_changed.connect(_on_direction_chaos_changed)
 
-	# Initialize scroll speed, globe scale, and vertical drift with current values
+	# Initialize scroll speed, globe scale, vertical drift, and direction chaos with current values
 	_update_scroll_speed()
 	_update_globe_scale()
 	_update_vertical_drift()
+	_update_direction_chaos()
 
 func start_rotation() -> void:
 	"""Called externally when loading is complete and it's safe to copy sprites"""
@@ -265,8 +272,18 @@ func _process(delta: float) -> void:
 	if is_paused:
 		return
 
+	# Handle direction chaos - randomly flip rotation direction
+	if direction_chaos_frequency > 0.0:
+		direction_chaos_next_change_time -= delta
+		if direction_chaos_next_change_time <= 0.0:
+			# Flip direction
+			direction_multiplier *= -1
+			# Schedule next change
+			direction_chaos_next_change_time = 1.0 / direction_chaos_frequency
+			print("[RotatingMap] Direction chaos! Flipped direction, multiplier now: ", direction_multiplier)
+
 	# Update scroll offset (in unscaled space)
-	scroll_offset += scroll_speed * delta
+	scroll_offset += scroll_speed * direction_multiplier * delta
 
 	# Wrap offset to stay within one map width
 	scroll_offset = fmod(scroll_offset, map_width)
@@ -365,3 +382,16 @@ func _update_vertical_drift() -> void:
 	"""Update vertical drift amplitude based on current value from GameState"""
 	vertical_drift_amplitude = GameState.get_vertical_drift_amplitude()
 	print("[RotatingMap] Vertical drift amplitude updated to: ", vertical_drift_amplitude)
+
+
+func _on_direction_chaos_changed(frequency: float) -> void:
+	"""Handle direction chaos changes from GameState"""
+	_update_direction_chaos()
+
+
+func _update_direction_chaos() -> void:
+	"""Update direction chaos parameters based on current value from GameState"""
+	direction_chaos_frequency = GameState.get_direction_chaos_frequency()
+	if direction_chaos_frequency > 0.0:
+		direction_chaos_next_change_time = 1.0 / direction_chaos_frequency
+	print("[RotatingMap] Direction chaos frequency updated to: ", direction_chaos_frequency)

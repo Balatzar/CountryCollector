@@ -323,6 +323,56 @@ const MALUS_VERTICAL_MOVEMENT_T5 = {
 	"repeatable": false
 }
 
+const MALUS_DIRECTION_CHAOS_T1 = {
+	"id": "direction_chaos_t1",
+	"type": PowerUpType.MALUS,
+	"name": "Direction Chaos I",
+	"description": "Map occasionally reverses rotation",
+	"family": "direction_chaos",
+	"tier": 1,
+	"repeatable": false
+}
+
+const MALUS_DIRECTION_CHAOS_T2 = {
+	"id": "direction_chaos_t2",
+	"type": PowerUpType.MALUS,
+	"name": "Direction Chaos II",
+	"description": "Map often reverses rotation",
+	"family": "direction_chaos",
+	"tier": 2,
+	"repeatable": false
+}
+
+const MALUS_DIRECTION_CHAOS_T3 = {
+	"id": "direction_chaos_t3",
+	"type": PowerUpType.MALUS,
+	"name": "Direction Chaos III",
+	"description": "Map frequently reverses rotation",
+	"family": "direction_chaos",
+	"tier": 3,
+	"repeatable": false
+}
+
+const MALUS_DIRECTION_CHAOS_T4 = {
+	"id": "direction_chaos_t4",
+	"type": PowerUpType.MALUS,
+	"name": "Direction Chaos IV",
+	"description": "Map erratically reverses rotation",
+	"family": "direction_chaos",
+	"tier": 4,
+	"repeatable": false
+}
+
+const MALUS_DIRECTION_CHAOS_T5 = {
+	"id": "direction_chaos_t5",
+	"type": PowerUpType.MALUS,
+	"name": "Direction Chaos V",
+	"description": "Map constantly reverses rotation",
+	"family": "direction_chaos",
+	"tier": 5,
+	"repeatable": false
+}
+
 # ===== POWER-UP POOLS =====
 
 # All bonuses available for selection
@@ -361,7 +411,12 @@ const ALL_MALUSES = [
 	MALUS_VERTICAL_MOVEMENT_T2,
 	MALUS_VERTICAL_MOVEMENT_T3,
 	MALUS_VERTICAL_MOVEMENT_T4,
-	MALUS_VERTICAL_MOVEMENT_T5
+	MALUS_VERTICAL_MOVEMENT_T5,
+	MALUS_DIRECTION_CHAOS_T1,
+	MALUS_DIRECTION_CHAOS_T2,
+	MALUS_DIRECTION_CHAOS_T3,
+	MALUS_DIRECTION_CHAOS_T4,
+	MALUS_DIRECTION_CHAOS_T5
 ]
 
 # ===== HELPER FUNCTIONS =====
