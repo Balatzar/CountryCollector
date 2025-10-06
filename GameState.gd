@@ -20,6 +20,7 @@ signal rotation_speed_changed(multiplier: float)
 signal globe_scale_changed(multiplier: float)
 signal zoom_bonus_acquired(zoom_level: int)
 signal vertical_drift_changed(amplitude: float)
+signal game_over()
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -193,6 +194,10 @@ func throw_dart() -> void:
 		dart_thrown.emit()
 		darts_changed.emit(remaining_darts)
 
+		# Check for game over
+		if remaining_darts == 0:
+			game_over.emit()
+
 
 # Get remaining darts count
 func get_remaining_darts() -> int:
@@ -209,7 +214,14 @@ func reset() -> void:
 	collected_countries.clear()
 	remaining_darts = MAX_DARTS
 	acquired_cards.clear()
+	xp = 0
+	level = 1
+	zoom_bonus_tier = 0
+	unzoom_malus_tier = 0
+	current_zoom_level = 0
+	vertical_drift_tier = 0
 	darts_changed.emit(remaining_darts)
+	xp_changed.emit(xp, level)
 
 
 # Open the store overlay

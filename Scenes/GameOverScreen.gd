@@ -1,15 +1,15 @@
-extends Control
+extends CanvasLayer
 
 ## Dramatic game over screen with stats and restart button
 
 signal restart_game_pressed()
 
 # Node references
-@onready var restart_button: Button = $CenterContainer/VBoxContainer/RestartButton
-@onready var game_over_label: Label = $CenterContainer/VBoxContainer/GameOverLabel
-@onready var stats_container: VBoxContainer = $CenterContainer/VBoxContainer/StatsContainer
-@onready var countries_collected_label: Label = $CenterContainer/VBoxContainer/StatsContainer/CountriesCollectedLabel
-@onready var darts_used_label: Label = $CenterContainer/VBoxContainer/StatsContainer/DartsUsedLabel
+@onready var restart_button: Button = $Control/CenterContainer/VBoxContainer/RestartButton
+@onready var game_over_label: Label = $Control/CenterContainer/VBoxContainer/GameOverLabel
+@onready var stats_container: VBoxContainer = $Control/CenterContainer/VBoxContainer/StatsContainer
+@onready var countries_collected_label: Label = $Control/CenterContainer/VBoxContainer/StatsContainer/CountriesCollectedLabel
+@onready var darts_used_label: Label = $Control/CenterContainer/VBoxContainer/StatsContainer/DartsUsedLabel
 
 # Animation variables
 var time_passed: float = 0.0
@@ -21,19 +21,22 @@ var title_animation_time: float = 0.0
 func _ready() -> void:
 	# Set pivot offset to center of button for proper scaling
 	restart_button.pivot_offset = restart_button.size / 2.0
-	
+
 	# Connect button signal
 	restart_button.pressed.connect(_on_restart_button_pressed)
-	
+
+
+func show_screen() -> void:
 	# Update stats from GameState
 	_update_stats()
-	
+
 	# Start with title invisible for dramatic entrance
 	game_over_label.modulate.a = 0.0
 	stats_container.modulate.a = 0.0
 	restart_button.modulate.a = 0.0
-	
-	# Animate entrance
+
+	# Show and animate entrance
+	show()
 	_animate_entrance()
 
 
@@ -72,9 +75,9 @@ func _update_stats() -> void:
 	var collected := GameState.get_collected_count()
 	var total := GameState.get_total_countries()
 	var darts_used := GameState.MAX_DARTS - GameState.get_remaining_darts()
-	
+
 	countries_collected_label.text = "Countries Collected: %d / %d" % [collected, total]
-	darts_used_label.text = "Darts Used: %d / %d" % [darts_used, GameState.MAX_DARTS]
+	darts_used_label.text = "Darts Used: %d" % darts_used
 
 
 func _on_restart_button_pressed() -> void:
