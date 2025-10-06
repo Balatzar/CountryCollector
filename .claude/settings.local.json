@@ -23,7 +23,8 @@
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/debug_panel.gd)",
       "Bash(find:*)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/globe_and_dart_with_progress.gd)",
-      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GameOverScreen.gd)"
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/GameOverScreen.gd)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --check-only --path . --script Scenes/TitleScreen.gd)"
     ],
     "deny": [],
     "ask": []
