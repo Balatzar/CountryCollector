@@ -25,7 +25,6 @@ AudioManager="*res://AudioManager.gd"
 
 window/size/viewport_width=1800
 window/size/viewport_height=1200
-window/size/mode=2
 window/size/resizable=false
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
