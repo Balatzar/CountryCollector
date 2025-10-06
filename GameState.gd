@@ -73,6 +73,7 @@ const XP_REWARDS = {
 
 func _ready() -> void:
 	_apply_custom_cursor()
+	# Engine.time_scale = 0.2
 
 func _apply_custom_cursor() -> void:
 	# Prefer cursor.png, fallback to pointer.png if not present

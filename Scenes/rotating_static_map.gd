@@ -30,6 +30,14 @@ var is_paused: bool = true  # Start paused until loading is complete
 # Track if current dart hit a country (reset on each throw)
 var dart_hit_country: bool = false
 
+# Store click position and time for delayed country detection
+var pending_click_position: Vector2 = Vector2.ZERO
+var click_time: float = 0.0
+
+# Debug markers
+var click_marker: ColorRect = null
+var hit_marker: ColorRect = null
+
 # Notification colors
 const COLOR_HIT = Color.LIGHT_GREEN
 const COLOR_MISS = Color.ORANGE
@@ -107,10 +115,57 @@ func start_rotation() -> void:
 func _on_dart_thrown() -> void:
 	# Reset hit tracking for new dart
 	dart_hit_country = false
+	Engine.time_scale = 0.2
 
 
 func _on_dart_landed() -> void:
-	# Collect the pending country when dart lands
+	Engine.time_scale = 1
+	# Calculate the scroll offset that occurred during dart flight
+	var landing_time: float = Time.get_ticks_msec() / 1000.0
+	var elapsed_real_time: float = landing_time - click_time
+
+	# Account for Engine.time_scale - the dart flight was slowed down by time_scale
+	# So the actual game time elapsed is: real_time * time_scale
+	var elapsed_game_time: float = elapsed_real_time * 0.2  # time_scale was 0.2 during flight
+
+	# Calculate how far the globe scrolled during dart flight (in unscaled space)
+	var scroll_distance: float = scroll_speed * elapsed_game_time
+
+	# Account for the scale factor when converting to viewport space
+	var scaled_scroll_distance: float = scroll_distance * world_scroller.scale.x
+
+	# The globe moved left (scroll_distance), so we need to adjust coordinates:
+	# - Visual markers: shift LEFT to show where things were/are relative to current globe position
+	# - Hit detection: shift RIGHT to compensate for the globe's leftward movement
+	var adjusted_position: Vector2 = pending_click_position + Vector2(scaled_scroll_distance, 0)
+
+	print("[RotatingMap] Dart landed after ", elapsed_real_time, "s real time (", elapsed_game_time, "s game time). Scroll distance: ", scroll_distance, " (scaled: ", scaled_scroll_distance, ")")
+	print("[RotatingMap] Original click: ", pending_click_position, " -> Adjusted position: ", adjusted_position)
+
+	# Show debug markers - offset LEFT to show where they are relative to current globe position
+	_show_debug_marker(pending_click_position - Vector2(scaled_scroll_distance, 0), true)  # Red for original click (drifted left)
+	_show_debug_marker(adjusted_position - Vector2(scaled_scroll_distance, 0), false)  # Green for where hit detection happens (under cursor)
+
+	# Now detect the country at the adjusted position
+	var vp := get_viewport()
+	var img: Image = vp.get_texture().get_image()
+	if not img.is_empty():
+		var viewport_rect = vp.get_visible_rect()
+
+		# Map adjusted position to texture coordinates
+		var uv = adjusted_position / viewport_rect.size
+		var px := Vector2i(uv * Vector2(img.get_width(), img.get_height()))
+
+		# Clamp to valid pixel range
+		if px.x >= 0 and px.y >= 0 and px.x < img.get_width() and px.y < img.get_height():
+			var color: Color = img.get_pixelv(px)
+			var country_id = GameState.get_country_by_color(color, 0.015)
+
+			if country_id != "":
+				print("[RotatingMap] Hit country at adjusted position: ", country_id)
+				GameState.pending_country = country_id
+
+	# Collect the pending country if found
 	if GameState.pending_country != "":
 		GameState.collect_country(GameState.pending_country)
 		GameState.pending_country = ""
@@ -122,6 +177,17 @@ func _on_dart_landed() -> void:
 			await get_tree().create_timer(0.1).timeout
 			var fun_msg = FUN_FAIL_MESSAGES[randi() % FUN_FAIL_MESSAGES.size()]
 			GameState.show_notification(fun_msg, GameState.last_dart_position, COLOR_FUN)
+
+	is_paused = true
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		# Cmd+; for XP (semicolon key)
+		if event.keycode == KEY_0 and event.meta_pressed:
+			is_paused = false
+			print("unpase")
+			get_viewport().set_input_as_handled()
 
 
 func _on_country_collected(country_id: String) -> void:
@@ -267,34 +333,10 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			var vp := get_viewport()
-			var img: Image = vp.get_texture().get_image()  # CPU readback of the rendered frame
-			if img.is_empty():
-					return
-
-			# With viewport stretch mode, event.position is in viewport space (1800x1200)
-			# but we need to sample from the actual rendered texture
-			var mouse_pos = event.position
-			var viewport_rect = vp.get_visible_rect()
-
-			# Map mouse position to texture coordinates
-			# viewport_rect.size is the logical viewport size (1800x1200)
-			# img size is the actual texture size (should match)
-			var uv = mouse_pos / viewport_rect.size
-			var px := Vector2i(uv * Vector2(img.get_width(), img.get_height()))
-
-			# Clamp to valid pixel range
-			if px.x >= 0 and px.y >= 0 and px.x < img.get_width() and px.y < img.get_height():
-					var color: Color = img.get_pixelv(px)
-
-					# Use a higher tolerance to account for rendering differences
-					var country_id = GameState.get_country_by_color(color, 0.015)
-
-					if country_id != "":
-							print("Clicked country: ", country_id)
-							GameState.set_pending_country(country_id)
-					else:
-							print("No country found at color: ", color)
+			# Store the click position and time for later processing
+			pending_click_position = event.position
+			click_time = Time.get_ticks_msec() / 1000.0
+			print("[RotatingMap] Click stored at position: ", pending_click_position, " at time: ", click_time)
 
 
 func _on_rotation_speed_changed(_multiplier: float) -> void:
@@ -339,3 +381,34 @@ func _update_vertical_drift() -> void:
 	"""Update vertical drift amplitude based on current value from GameState"""
 	vertical_drift_amplitude = GameState.get_vertical_drift_amplitude()
 	print("[RotatingMap] Vertical drift amplitude updated to: ", vertical_drift_amplitude)
+
+
+func _show_debug_marker(position: Vector2, is_click: bool) -> void:
+	"""Show a colored debug marker at the specified position"""
+	var marker = ColorRect.new()
+	marker.size = Vector2(20, 20)
+	marker.position = position - marker.size / 2  # Center on position
+	marker.color = Color.RED if is_click else Color.GREEN
+	marker.z_index = 1000  # Draw on top of everything
+
+	# Add to the scene
+	add_child(marker)
+
+	# Store reference
+	if is_click:
+		if click_marker:
+			click_marker.queue_free()
+		click_marker = marker
+	else:
+		if hit_marker:
+			hit_marker.queue_free()
+		hit_marker = marker
+
+	# Auto-remove after 2 seconds
+	await get_tree().create_timer(2.0).timeout
+	if is_instance_valid(marker):
+		marker.queue_free()
+		if is_click and click_marker == marker:
+			click_marker = null
+		elif not is_click and hit_marker == marker:
+			hit_marker = null
