@@ -37,8 +37,9 @@ func _on_start_button_pressed() -> void:
 	# Emit signal to notify that game should start
 	start_game_pressed.emit()
 
-	# Add a quick scale animation on press
+	# Add a quick scale animation on press then hide
 	var tween := create_tween()
 	tween.tween_property(start_button, "scale", Vector2(0.95, 0.95), 0.1)
 	tween.tween_property(start_button, "scale", Vector2.ONE, 0.1)
+	tween.tween_callback(func(): hide())
 
