@@ -21,6 +21,7 @@ end_handle_strength = 0.7
 start_forward_bias = 0.0
 end_backward_bias = -0.5
 projectile_rotation_factor = 1.0
+projectile_duration = 0.2
 
 [node name="SpriteLeft" type="Sprite2D" parent="."]
 position = Vector2(-12, -299)
