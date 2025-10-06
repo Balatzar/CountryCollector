@@ -28,6 +28,7 @@ func _ready() -> void:
 	GameState.darts_changed.connect(_on_darts_changed)
 	GameState.card_acquired.connect(_on_card_acquired)
 	GameState.zoom_bonus_acquired.connect(_on_zoom_bonus_acquired)
+	GameState.countries_loaded.connect(_on_countries_loaded)
 
 	# Initialize countries list with any already collected countries
 	for country_id in GameState.collected_countries:
@@ -171,8 +172,15 @@ func _on_zoom_bonus_acquired(zoom_level: int) -> void:
 	zoom_help_panel.visible = (zoom_level > 0)
 
 
+func _on_countries_loaded() -> void:
+	"""Update the country title when all countries are loaded from the map"""
+	_update_country_title()
+
+
 func _update_country_title() -> void:
 	"""Update the countries title with current count"""
 	var collected := GameState.collected_countries.size()
 	var total := GameState.all_countries.size()
+	if total < 179:
+		total = 179  # Hardcoded total while map is loading
 	countries_title.text = "COUNTRIES (%d/%d)" % [collected, total]
