@@ -10,6 +10,7 @@ var level_up_player: AudioStreamPlayer
 var select_player: AudioStreamPlayer
 var throw_player: AudioStreamPlayer
 var miss_player: AudioStreamPlayer
+var bg_player: AudioStreamPlayer
 
 # Audio streams (preloaded)
 var click_sound: AudioStream
@@ -18,6 +19,7 @@ var level_up_sound: AudioStream
 var select_sound: AudioStream
 var throw_sound: AudioStream
 var miss_sound: AudioStream
+var bg_music: AudioStream
 
 # Volume settings (in dB, 0 = full volume, -80 = silent)
 const CLICK_VOLUME: float = -5.0
@@ -26,6 +28,7 @@ const LEVEL_UP_VOLUME: float = 0.0
 const SELECT_VOLUME: float = -3.0
 const THROW_VOLUME: float = -2.0
 const MISS_VOLUME: float = -1.0
+const BG_VOLUME: float = -18.0
 
 
 func _ready() -> void:
@@ -36,6 +39,11 @@ func _ready() -> void:
 	select_sound = load("res://Assets/select.mp3")
 	throw_sound = load("res://Assets/throw.mp3")
 	miss_sound = load("res://Assets/miss.mp3")
+	bg_music = load("res://Assets/bg-music.mp3")
+	# Ensure background music loops
+	var mp3 := bg_music as AudioStreamMP3
+	if mp3:
+		mp3.loop = true
 
 	# Create audio stream players
 	click_player = _create_audio_player("ClickPlayer", click_sound, CLICK_VOLUME)
@@ -44,6 +52,9 @@ func _ready() -> void:
 	select_player = _create_audio_player("SelectPlayer", select_sound, SELECT_VOLUME)
 	throw_player = _create_audio_player("ThrowPlayer", throw_sound, THROW_VOLUME)
 	miss_player = _create_audio_player("MissPlayer", miss_sound, MISS_VOLUME)
+	bg_player = _create_audio_player("BackgroundMusic", bg_music, BG_VOLUME)
+	if bg_player and not bg_player.playing:
+		bg_player.play()
 
 	# Connect to GameState signals for game events
 	GameState.country_collected.connect(_on_country_collected)
