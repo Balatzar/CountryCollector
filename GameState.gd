@@ -41,6 +41,7 @@ var last_dart_position: Vector2 = Vector2.ZERO
 # Dart tracking
 const MAX_DARTS: int = 10
 var remaining_darts: int = MAX_DARTS
+var darts_thrown: int = 0  # Track total darts thrown throughout the game
 
 # Card/bonus tracking
 var acquired_cards: Array[Dictionary] = []
@@ -206,6 +207,7 @@ func get_total_countries() -> int:
 func throw_dart() -> void:
 	if remaining_darts > 0:
 		remaining_darts -= 1
+		darts_thrown += 1
 		dart_thrown.emit()
 		darts_changed.emit(remaining_darts)
 
@@ -217,6 +219,11 @@ func throw_dart() -> void:
 # Get remaining darts count
 func get_remaining_darts() -> int:
 	return remaining_darts
+
+
+# Get total darts thrown
+func get_darts_thrown() -> int:
+	return darts_thrown
 
 
 # Check if player has darts remaining
@@ -235,6 +242,7 @@ func refund_dart() -> void:
 func reset() -> void:
 	collected_countries.clear()
 	remaining_darts = MAX_DARTS
+	darts_thrown = 0
 	acquired_cards.clear()
 	xp = 0
 	level = 1

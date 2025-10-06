@@ -74,7 +74,7 @@ func _animate_entrance() -> void:
 func _update_stats() -> void:
 	var collected := GameState.get_collected_count()
 	var total := GameState.get_total_countries()
-	var darts_used := GameState.MAX_DARTS - GameState.get_remaining_darts()
+	var darts_used := GameState.get_darts_thrown()
 
 	countries_collected_label.text = "Countries Collected: %d / %d" % [collected, total]
 	darts_used_label.text = "Darts Used: %d" % darts_used
