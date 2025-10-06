@@ -23,6 +23,8 @@ signal vertical_drift_changed(amplitude: float)
 signal direction_chaos_changed(frequency: float)
 signal time_freeze_changed(tier: int, shots_until_ready: int, available: bool)
 signal game_over()
+signal streak_started(streak_count: int)
+signal streak_ended(final_count: int)
 
 # List of all countries in the game
 var all_countries: Array[String] = []
@@ -70,6 +72,11 @@ var time_freeze_available: bool = false  # Track if power is ready to use
 var time_freeze_shots_until_ready: int = 0  # Counter for shots remaining until ready
 var is_time_frozen: bool = false  # Track if time is currently frozen
 
+# Streak tracking
+const STREAK_THRESHOLD: int = 3  # Number of consecutive hits needed to activate streak
+var current_streak: int = 0  # Current consecutive hit count
+var is_on_streak: bool = false  # Whether streak mode is active
+
 # Loading state
 var loading_in_progress: bool = false
 var countries_loaded_count: int = 0
@@ -82,11 +89,11 @@ var level: int = 1
 
 # XP rewards based on country size
 const XP_REWARDS = {
-	CountryNames.Size.MICROSCOPIC: 200,
-	CountryNames.Size.SMALL: 100,
-	CountryNames.Size.MEDIUM: 80,
-	CountryNames.Size.BIG: 50,
-	CountryNames.Size.HUGE: 20
+	CountryNames.Size.MICROSCOPIC: 150,
+	CountryNames.Size.SMALL: 80,
+	CountryNames.Size.MEDIUM: 60,
+	CountryNames.Size.BIG: 40,
+	CountryNames.Size.HUGE: 10
 }
 
 
@@ -273,6 +280,8 @@ func reset() -> void:
 	time_freeze_available = false
 	time_freeze_shots_until_ready = 0
 	is_time_frozen = false
+	current_streak = 0
+	is_on_streak = false
 	darts_changed.emit(remaining_darts)
 	xp_changed.emit(xp, level)
 
@@ -443,33 +452,35 @@ func get_active_powerups_by_family() -> Dictionary:
 
 # Get the current rotation speed multiplier based on acquired cards
 func get_rotation_speed_multiplier() -> float:
-	var multiplier := 1.0
+	var slow_multiplier := 1.0
+	var fast_multiplier := 1.0
 
-	# Check for slower map bonuses (reduce speed)
+	# Check for slower map bonuses (reduce speed) - inverse of faster map values
 	if has_card("Slower Map V"):
-		multiplier *= 0.2  # 80% reduction
+		slow_multiplier = 0.5  # 50% reduction (inverse of 2.0x)
 	elif has_card("Slower Map IV"):
-		multiplier *= 0.35  # 65% reduction
+		slow_multiplier = 0.556  # ~44% reduction (inverse of 1.8x)
 	elif has_card("Slower Map III"):
-		multiplier *= 0.5  # 50% reduction
+		slow_multiplier = 0.625  # 37.5% reduction (inverse of 1.6x)
 	elif has_card("Slower Map II"):
-		multiplier *= 0.7  # 30% reduction
+		slow_multiplier = 0.714  # ~29% reduction (inverse of 1.4x)
 	elif has_card("Slower Map I"):
-		multiplier *= 0.85  # 15% reduction
+		slow_multiplier = 0.833  # ~17% reduction (inverse of 1.2x)
 
 	# Check for faster map maluses (increase speed)
 	if has_card("Faster Map V"):
-		multiplier *= 2.0  # 100% increase
+		fast_multiplier = 2.0  # 100% increase
 	elif has_card("Faster Map IV"):
-		multiplier *= 1.8  # 80% increase
+		fast_multiplier = 1.8  # 80% increase
 	elif has_card("Faster Map III"):
-		multiplier *= 1.6  # 60% increase
+		fast_multiplier = 1.6  # 60% increase
 	elif has_card("Faster Map II"):
-		multiplier *= 1.4  # 40% increase
+		fast_multiplier = 1.4  # 40% increase
 	elif has_card("Faster Map I"):
-		multiplier *= 1.2  # 20% increase
+		fast_multiplier = 1.2  # 20% increase
 
-	return multiplier
+	# Combine: multiply them together so they perfectly cancel when equal tiers
+	return slow_multiplier * fast_multiplier
 
 
 # Get the current globe scale multiplier based on acquired unzoom maluses
