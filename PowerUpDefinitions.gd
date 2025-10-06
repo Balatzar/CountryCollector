@@ -38,15 +38,6 @@ const BONUS_SLOWER_MAP_T3 = {
 	"repeatable": false
 }
 
-const BONUS_EXTRA_SHOTS = {
-	"id": "extra_shots",
-	"type": PowerUpType.BONUS,
-	"name": "+5 Shots",
-	"description": "Gain 5 additional darts",
-	"tier": 0,
-	"repeatable": true
-}
-
 const BONUS_ZOOM_T1 = {
 	"id": "zoom_t1",
 	"type": PowerUpType.BONUS,
@@ -134,7 +125,7 @@ const MALUS_VERTICAL_MOVEMENT_T1 = {
 	"id": "vertical_movement_t1",
 	"type": PowerUpType.MALUS,
 	"name": "Vertical Drift I",
-	"description": "Map slowly drifts up and down (±30px)",
+	"description": "Map slowly drifts up and down",
 	"tier": 1,
 	"repeatable": false
 }
@@ -143,7 +134,7 @@ const MALUS_VERTICAL_MOVEMENT_T2 = {
 	"id": "vertical_movement_t2",
 	"type": PowerUpType.MALUS,
 	"name": "Vertical Drift II",
-	"description": "Map drifts up and down (±60px)",
+	"description": "Map drifts up and down",
 	"tier": 2,
 	"repeatable": false
 }
@@ -152,7 +143,7 @@ const MALUS_VERTICAL_MOVEMENT_T3 = {
 	"id": "vertical_movement_t3",
 	"type": PowerUpType.MALUS,
 	"name": "Vertical Drift III",
-	"description": "Map heavily drifts up and down (±100px)",
+	"description": "Map heavily drifts up and down",
 	"tier": 3,
 	"repeatable": false
 }
@@ -164,7 +155,6 @@ const ALL_BONUSES = [
 	BONUS_SLOWER_MAP_T1,
 	BONUS_SLOWER_MAP_T2,
 	BONUS_SLOWER_MAP_T3,
-	BONUS_EXTRA_SHOTS,
 	BONUS_ZOOM_T1,
 	BONUS_ZOOM_T2,
 	BONUS_ZOOM_T3

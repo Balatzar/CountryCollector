@@ -268,19 +268,22 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			var vp := get_viewport()
-			var img: Image = vp.get_texture().get_image()  # CPU readback of the frame
+			var img: Image = vp.get_texture().get_image()  # CPU readback of the rendered frame
 			if img.is_empty():
 					return
 
-			# If your window is stretched/scaled, map mouse -> texture size safely via UV
-			var mouse = event.position
-			var vp_size: Vector2 = vp.size
-			var tex_size: Vector2 = vp.get_texture().get_size()
-			var uv = mouse / vp_size
-			var px := Vector2i(uv * tex_size)
+			# With viewport stretch mode, event.position is in viewport space (1800x1200)
+			# but we need to sample from the actual rendered texture
+			var mouse_pos = event.position
+			var viewport_rect = vp.get_visible_rect()
 
-			# Depending on backend, you may need to flip vertically:
-			# img.flip_y()
+			# Map mouse position to texture coordinates
+			# viewport_rect.size is the logical viewport size (1800x1200)
+			# img size is the actual texture size (should match)
+			var uv = mouse_pos / viewport_rect.size
+			var px := Vector2i(uv * Vector2(img.get_width(), img.get_height()))
+
+			# Clamp to valid pixel range
 			if px.x >= 0 and px.y >= 0 and px.x < img.get_width() and px.y < img.get_height():
 					var color: Color = img.get_pixelv(px)
 
