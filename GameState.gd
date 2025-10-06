@@ -443,33 +443,35 @@ func get_active_powerups_by_family() -> Dictionary:
 
 # Get the current rotation speed multiplier based on acquired cards
 func get_rotation_speed_multiplier() -> float:
-	var multiplier := 1.0
+	var slow_multiplier := 1.0
+	var fast_multiplier := 1.0
 
-	# Check for slower map bonuses (reduce speed)
+	# Check for slower map bonuses (reduce speed) - inverse of faster map values
 	if has_card("Slower Map V"):
-		multiplier *= 0.2  # 80% reduction
+		slow_multiplier = 0.5  # 50% reduction (inverse of 2.0x)
 	elif has_card("Slower Map IV"):
-		multiplier *= 0.35  # 65% reduction
+		slow_multiplier = 0.556  # ~44% reduction (inverse of 1.8x)
 	elif has_card("Slower Map III"):
-		multiplier *= 0.5  # 50% reduction
+		slow_multiplier = 0.625  # 37.5% reduction (inverse of 1.6x)
 	elif has_card("Slower Map II"):
-		multiplier *= 0.7  # 30% reduction
+		slow_multiplier = 0.714  # ~29% reduction (inverse of 1.4x)
 	elif has_card("Slower Map I"):
-		multiplier *= 0.85  # 15% reduction
+		slow_multiplier = 0.833  # ~17% reduction (inverse of 1.2x)
 
 	# Check for faster map maluses (increase speed)
 	if has_card("Faster Map V"):
-		multiplier *= 2.0  # 100% increase
+		fast_multiplier = 2.0  # 100% increase
 	elif has_card("Faster Map IV"):
-		multiplier *= 1.8  # 80% increase
+		fast_multiplier = 1.8  # 80% increase
 	elif has_card("Faster Map III"):
-		multiplier *= 1.6  # 60% increase
+		fast_multiplier = 1.6  # 60% increase
 	elif has_card("Faster Map II"):
-		multiplier *= 1.4  # 40% increase
+		fast_multiplier = 1.4  # 40% increase
 	elif has_card("Faster Map I"):
-		multiplier *= 1.2  # 20% increase
+		fast_multiplier = 1.2  # 20% increase
 
-	return multiplier
+	# Combine: multiply them together so they perfectly cancel when equal tiers
+	return slow_multiplier * fast_multiplier
 
 
 # Get the current globe scale multiplier based on acquired unzoom maluses

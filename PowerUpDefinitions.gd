@@ -15,7 +15,7 @@ const BONUS_SLOWER_MAP_T1 = {
 	"id": "slower_map_t1",
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map I",
-	"description": "Map rotation speed reduced by 15%",
+	"description": "Slightly slower map rotation",
 	"family": "slower_map",
 	"tier": 1,
 	"repeatable": false
@@ -25,7 +25,7 @@ const BONUS_SLOWER_MAP_T2 = {
 	"id": "slower_map_t2",
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map II",
-	"description": "Map rotation speed reduced by 30%",
+	"description": "Moderately slower map rotation",
 	"family": "slower_map",
 	"tier": 2,
 	"repeatable": false
@@ -35,7 +35,7 @@ const BONUS_SLOWER_MAP_T3 = {
 	"id": "slower_map_t3",
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map III",
-	"description": "Map rotation speed reduced by 50%",
+	"description": "Noticeably slower map rotation",
 	"family": "slower_map",
 	"tier": 3,
 	"repeatable": false
@@ -45,7 +45,7 @@ const BONUS_SLOWER_MAP_T4 = {
 	"id": "slower_map_t4",
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map IV",
-	"description": "Map rotation speed reduced by 65%",
+	"description": "Much slower map rotation",
 	"family": "slower_map",
 	"tier": 4,
 	"repeatable": false
@@ -55,7 +55,7 @@ const BONUS_SLOWER_MAP_T5 = {
 	"id": "slower_map_t5",
 	"type": PowerUpType.BONUS,
 	"name": "Slower Map V",
-	"description": "Map rotation speed reduced by 80%",
+	"description": "Very slow map rotation",
 	"family": "slower_map",
 	"tier": 5,
 	"repeatable": false
@@ -227,7 +227,7 @@ const MALUS_FASTER_MAP_T1 = {
 	"id": "faster_map_t1",
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map I",
-	"description": "Map rotation speed increased by 20%",
+	"description": "Slightly faster map rotation",
 	"family": "faster_map",
 	"tier": 1,
 	"repeatable": false
@@ -237,7 +237,7 @@ const MALUS_FASTER_MAP_T2 = {
 	"id": "faster_map_t2",
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map II",
-	"description": "Map rotation speed increased by 40%",
+	"description": "Moderately faster map rotation",
 	"family": "faster_map",
 	"tier": 2,
 	"repeatable": false
@@ -247,7 +247,7 @@ const MALUS_FASTER_MAP_T3 = {
 	"id": "faster_map_t3",
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map III",
-	"description": "Map rotation speed increased by 60%",
+	"description": "Noticeably faster map rotation",
 	"family": "faster_map",
 	"tier": 3,
 	"repeatable": false
@@ -257,7 +257,7 @@ const MALUS_FASTER_MAP_T4 = {
 	"id": "faster_map_t4",
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map IV",
-	"description": "Map rotation speed increased by 80%",
+	"description": "Much faster map rotation",
 	"family": "faster_map",
 	"tier": 4,
 	"repeatable": false
@@ -267,7 +267,7 @@ const MALUS_FASTER_MAP_T5 = {
 	"id": "faster_map_t5",
 	"type": PowerUpType.MALUS,
 	"name": "Faster Map V",
-	"description": "Map rotation speed increased by 100%",
+	"description": "Very fast map rotation",
 	"family": "faster_map",
 	"tier": 5,
 	"repeatable": false
