@@ -167,7 +167,8 @@ func _on_dart_landed() -> void:
 				GameState.show_notification("+1 DART (Streak Bonus!)", GameState.last_dart_position, COLOR_STREAK)
 
 		# If dart refund is active and country was already collected, refund the dart
-		if was_already_collected and GameState.has_dart_refund:
+		# BUT: Don't refund during multishot (multishot darts don't consume player darts)
+		if was_already_collected and GameState.has_dart_refund and not is_multishot:
 			print("[DEBUG] Refunding dart!")
 			# Mark that this dart hit a country (even if already collected)
 			dart_hit_country = true
@@ -178,6 +179,10 @@ func _on_dart_landed() -> void:
 			GameState.show_notification("Already collected!", GameState.last_dart_position, COLOR_COUNTRY)
 			await get_tree().create_timer(0.2).timeout
 			GameState.show_notification("Reimbursed!", GameState.last_dart_position, COLOR_HIT)
+		elif was_already_collected and is_multishot:
+			# During multishot, just mark as hit but don't refund
+			dart_hit_country = true
+			GameState.show_notification("Already collected!", GameState.last_dart_position, COLOR_COUNTRY)
 	else:
 		# Miss: break streak if active (but not during multishot)
 		if not is_multishot:
