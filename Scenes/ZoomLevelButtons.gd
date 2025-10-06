@@ -47,7 +47,10 @@ func _on_button_pressed(level: int) -> void:
 	"""Handle button press - update selection and emit signal"""
 	if current_level == level:
 		return  # Already selected
-	
+
+	# Play click sound
+	AudioManager.play_click()
+
 	current_level = level
 	_update_button_states()
 	zoom_level_changed.emit(level)

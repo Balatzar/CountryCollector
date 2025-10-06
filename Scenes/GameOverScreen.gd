@@ -78,9 +78,12 @@ func _update_stats() -> void:
 
 
 func _on_restart_button_pressed() -> void:
+	# Play click sound
+	AudioManager.play_click()
+
 	# Emit signal to notify that game should restart
 	restart_game_pressed.emit()
-	
+
 	# Add a quick scale animation on press
 	var tween := create_tween()
 	tween.tween_property(restart_button, "scale", Vector2(0.95, 0.95), 0.1)

@@ -116,8 +116,11 @@ func _update_card_display() -> void:
 
 func _on_select_button_pressed() -> void:
 	"""Emit signal when card is selected"""
+	# Play select sound effect
+	AudioManager.play_select()
+
 	card_selected.emit(card_data)
-	
+
 	# Add a quick scale animation on press
 	var tween := create_tween()
 	tween.tween_property(self, "scale", Vector2(0.95, 0.95), 0.1)
