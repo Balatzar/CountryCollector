@@ -125,6 +125,10 @@ func _on_dart_landed() -> void:
 	# Skip streak logic during multishot
 	var is_multishot = GameState.is_multishot_active
 
+	# If no pending country is set (e.g., during multishot), check the landing position
+	if GameState.pending_country == "" and GameState.last_dart_position != Vector2.ZERO:
+		_sample_country_at_position(GameState.last_dart_position)
+
 	# Collect the pending country when dart lands
 	if GameState.pending_country != "":
 		# Check if the country is already collected (for dart refund)
@@ -444,6 +448,39 @@ func _get_most_frequent_color(colors: Array[Color], tolerance: float = 0.015) ->
 	return most_frequent_color
 
 
+func _sample_country_at_position(screen_pos: Vector2) -> void:
+	"""Sample the country at a given screen position and set it as pending if found"""
+	var vp := get_viewport()
+	var img: Image = vp.get_texture().get_image()  # CPU readback of the rendered frame
+	if img.is_empty():
+		return
+
+	# With viewport stretch mode, screen_pos is in viewport space (1800x1200)
+	# but we need to sample from the actual rendered texture
+	var viewport_rect = vp.get_visible_rect()
+
+	# Map position to texture coordinates
+	# viewport_rect.size is the logical viewport size (1800x1200)
+	# img size is the actual texture size (should match)
+	var uv = screen_pos / viewport_rect.size
+	var px := Vector2i(uv * Vector2(img.get_width(), img.get_height()))
+
+	# Clamp to valid pixel range
+	if px.x >= 0 and px.y >= 0 and px.x < img.get_width() and px.y < img.get_height():
+		# Sample colors in a circular area around the point (radius 10 = ~314 pixels sampled)
+		var sampled_colors = _sample_colors_in_radius(img, px, 10)
+		var color: Color = _get_most_frequent_color(sampled_colors)
+
+		# Use a higher tolerance to account for rendering differences
+		var country_id = GameState.get_country_by_color(color, 0.015)
+
+		if country_id != "":
+			print("Detected country at position: ", country_id)
+			GameState.set_pending_country(country_id)
+		else:
+			print("No country found at color: ", color)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	# Handle Enter key for time freeze
 	if event is InputEventKey:
@@ -452,36 +489,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				GameState.use_time_freeze()
 
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			var vp := get_viewport()
-			var img: Image = vp.get_texture().get_image()  # CPU readback of the rendered frame
-			if img.is_empty():
-					return
-
-			# With viewport stretch mode, event.position is in viewport space (1800x1200)
-			# but we need to sample from the actual rendered texture
-			var mouse_pos = event.position
-			var viewport_rect = vp.get_visible_rect()
-
-			# Map mouse position to texture coordinates
-			# viewport_rect.size is the logical viewport size (1800x1200)
-			# img size is the actual texture size (should match)
-			var uv = mouse_pos / viewport_rect.size
-			var px := Vector2i(uv * Vector2(img.get_width(), img.get_height()))
-
-			# Clamp to valid pixel range
-			if px.x >= 0 and px.y >= 0 and px.x < img.get_width() and px.y < img.get_height():
-					# Sample colors in a circular area around the click point (radius 10 = ~314 pixels sampled)
-					var sampled_colors = _sample_colors_in_radius(img, px, 10)
-					var color: Color = _get_most_frequent_color(sampled_colors)
-
-					# Use a higher tolerance to account for rendering differences
-					var country_id = GameState.get_country_by_color(color, 0.015)
-
-					if country_id != "":
-							print("Clicked country: ", country_id)
-							GameState.set_pending_country(country_id)
-					else:
-							print("No country found at color: ", color)
+		# Sample country at click position
+		_sample_country_at_position(event.position)
 
 
 func _on_rotation_speed_changed(_multiplier: float) -> void:
