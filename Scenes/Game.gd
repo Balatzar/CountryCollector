@@ -9,6 +9,7 @@ extends Node2D
 @onready var xp_bar: MarginContainer = $GameOverlay/MarginContainer/XPBarContainer
 @onready var game_over_screen: CanvasLayer = $GameOverScreen
 @onready var bg_space: Sprite2D = $BgSpace
+@onready var streak_display: Control = $Streak
 
 ## Parallax state
 var bg_base_position: Vector2
@@ -37,6 +38,10 @@ func _ready() -> void:
 
 	# Hide game over screen initially
 	game_over_screen.hide()
+
+	# Connect to streak signals
+	GameState.streak_started.connect(_on_streak_started)
+	GameState.streak_ended.connect(_on_streak_ended)
 
 
 func _on_notification_requested(text: String, notif_position: Vector2, color: Color) -> void:
@@ -69,6 +74,21 @@ func _on_restart_game() -> void:
 	# Unpause and reload the scene
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+
+
+func _on_streak_started(streak_count: int) -> void:
+	# Show streak display and play animation
+	streak_display.show()
+	var anim_player = streak_display.get_node("AnimationPlayer")
+	if anim_player:
+		anim_player.play("enter")
+
+
+func _on_streak_ended(final_count: int) -> void:
+	# Hide streak display
+	streak_display.hide()
+
+
 func _process(delta: float) -> void:
 	_update_parallax(delta)
 
