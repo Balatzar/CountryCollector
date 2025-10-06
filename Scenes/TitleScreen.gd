@@ -31,6 +31,9 @@ func _process(delta: float) -> void:
 
 
 func _on_start_button_pressed() -> void:
+	# Play click sound
+	AudioManager.play_click()
+
 	# Emit signal to notify that game should start
 	start_game_pressed.emit()
 

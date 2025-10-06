@@ -33,6 +33,9 @@ func _ready() -> void:
 
 func show_store() -> void:
 	"""Display the store with randomly generated power-up cards"""
+	# Play level up sound when store opens
+	AudioManager.play_level_up()
+
 	# Clear existing cards
 	_clear_cards()
 

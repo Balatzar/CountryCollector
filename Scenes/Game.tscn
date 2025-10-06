@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://vpm14equhjq1" path="res://Scenes/GlobeAndDartWithProgress.tscn" id="1_gl6un"]
 [ext_resource type="Script" uid="uid://bheof2fagiofc" path="res://Scenes/Game.gd" id="1_kldst"]
-[ext_resource type="Texture2D" uid="uid://btupb7t4fok1f" path="res://Assets/bg.png" id="2_b2bpf"]
+[ext_resource type="Texture2D" uid="uid://b53s5pb3jay38" path="res://Assets/bg_space.png" id="2_fgofq"]
 [ext_resource type="PackedScene" uid="uid://dkm8y5qvxh3yw" path="res://Scenes/GameOverlay.tscn" id="2_j5yw3"]
 [ext_resource type="PackedScene" uid="uid://bk3qxoc3yvyp2" path="res://Scenes/NotificationDisplay.tscn" id="4_b2bpf"]
 [ext_resource type="PackedScene" uid="uid://cc2bky04q0r5b" path="res://Scenes/StoreOverlay.tscn" id="5_b2bpf"]
@@ -12,10 +12,9 @@
 [node name="Game" type="Node2D"]
 script = ExtResource("1_kldst")
 
-[node name="Bg" type="Sprite2D" parent="."]
-position = Vector2(916.25, 612.25)
-scale = Vector2(1.432567, 1.3512222)
-texture = ExtResource("2_b2bpf")
+[node name="BgSpace" type="Sprite2D" parent="."]
+position = Vector2(875, 588)
+texture = ExtResource("2_fgofq")
 
 [node name="GlobeAndDartWithProgress" parent="." instance=ExtResource("1_gl6un")]
 

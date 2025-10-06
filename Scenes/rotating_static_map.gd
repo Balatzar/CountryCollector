@@ -117,6 +117,9 @@ func _on_dart_landed() -> void:
 	else:
 		# Show miss notification if we didn't hit a country
 		if not dart_hit_country:
+			# Play miss sound
+			AudioManager.play_miss()
+
 			GameState.show_notification("Miss!", GameState.last_dart_position, COLOR_MISS)
 			# Show fun fail message after 100ms
 			await get_tree().create_timer(0.1).timeout
