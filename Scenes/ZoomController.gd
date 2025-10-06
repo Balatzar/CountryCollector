@@ -8,6 +8,8 @@ extends Node2D
 @export var zoom_level_1: float = 1.5
 @export var zoom_level_2: float = 2.0
 @export var zoom_level_3: float = 3.0
+@export var zoom_level_4: float = 4.0
+@export var zoom_level_5: float = 5.0
 @export var zoom_duration: float = 0.3  # Duration of zoom animation in seconds
 
 # Node references - will be set from the RotatingStaticMap
@@ -15,7 +17,7 @@ var globe_display: TextureRect = null
 var rotating_map: Node2D = null
 
 # Internal state
-var current_zoom_level: int = 1  # 1, 2, or 3
+var current_zoom_level: int = 1  # 1, 2, 3, 4, or 5
 var is_zoomed: bool = false
 var base_scale: Vector2 = Vector2.ONE
 var base_position: Vector2 = Vector2.ZERO
@@ -62,11 +64,11 @@ func _input(event: InputEvent) -> void:
 
 
 func set_zoom_level(level: int) -> void:
-	"""Set the current zoom level (1, 2, or 3)"""
-	if level < 1 or level > 3:
+	"""Set the current zoom level (1, 2, 3, 4, or 5)"""
+	if level < 1 or level > 5:
 		push_error("Invalid zoom level: " + str(level))
 		return
-	
+
 	current_zoom_level = level
 	print("[ZoomController] Zoom level set to: ", level)
 
@@ -80,6 +82,10 @@ func get_zoom_factor() -> float:
 			return zoom_level_2
 		3:
 			return zoom_level_3
+		4:
+			return zoom_level_4
+		5:
+			return zoom_level_5
 		_:
 			return zoom_level_1
 

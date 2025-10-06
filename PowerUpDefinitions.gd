@@ -41,6 +41,26 @@ const BONUS_SLOWER_MAP_T3 = {
 	"repeatable": false
 }
 
+const BONUS_SLOWER_MAP_T4 = {
+	"id": "slower_map_t4",
+	"type": PowerUpType.BONUS,
+	"name": "Slower Map IV",
+	"description": "Map rotation speed reduced by 65%",
+	"family": "slower_map",
+	"tier": 4,
+	"repeatable": false
+}
+
+const BONUS_SLOWER_MAP_T5 = {
+	"id": "slower_map_t5",
+	"type": PowerUpType.BONUS,
+	"name": "Slower Map V",
+	"description": "Map rotation speed reduced by 80%",
+	"family": "slower_map",
+	"tier": 5,
+	"repeatable": false
+}
+
 const BONUS_ZOOM_T1 = {
 	"id": "zoom_t1",
 	"type": PowerUpType.BONUS,
@@ -65,9 +85,29 @@ const BONUS_ZOOM_T3 = {
 	"id": "zoom_t3",
 	"type": PowerUpType.BONUS,
 	"name": "Zoom III",
-	"description": "Maximum map zoom (3.0x)",
+	"description": "Map zoom (3.0x)",
 	"family": "zoom",
 	"tier": 3,
+	"repeatable": false
+}
+
+const BONUS_ZOOM_T4 = {
+	"id": "zoom_t4",
+	"type": PowerUpType.BONUS,
+	"name": "Zoom IV",
+	"description": "Enhanced map zoom (4.0x)",
+	"family": "zoom",
+	"tier": 4,
+	"repeatable": false
+}
+
+const BONUS_ZOOM_T5 = {
+	"id": "zoom_t5",
+	"type": PowerUpType.BONUS,
+	"name": "Zoom V",
+	"description": "Maximum map zoom (5.0x)",
+	"family": "zoom",
+	"tier": 5,
 	"repeatable": false
 }
 
@@ -98,6 +138,26 @@ const BONUS_EXTRA_XP_T3 = {
 	"description": "+15 XP per successful hit",
 	"family": "extra_xp",
 	"tier": 3,
+	"repeatable": false
+}
+
+const BONUS_EXTRA_XP_T4 = {
+	"id": "extra_xp_t4",
+	"type": PowerUpType.BONUS,
+	"name": "Extra XP IV",
+	"description": "+20 XP per successful hit",
+	"family": "extra_xp",
+	"tier": 4,
+	"repeatable": false
+}
+
+const BONUS_EXTRA_XP_T5 = {
+	"id": "extra_xp_t5",
+	"type": PowerUpType.BONUS,
+	"name": "Extra XP V",
+	"description": "+25 XP per successful hit",
+	"family": "extra_xp",
+	"tier": 5,
 	"repeatable": false
 }
 
@@ -133,6 +193,26 @@ const MALUS_FASTER_MAP_T3 = {
 	"repeatable": false
 }
 
+const MALUS_FASTER_MAP_T4 = {
+	"id": "faster_map_t4",
+	"type": PowerUpType.MALUS,
+	"name": "Faster Map IV",
+	"description": "Map rotation speed increased by 80%",
+	"family": "faster_map",
+	"tier": 4,
+	"repeatable": false
+}
+
+const MALUS_FASTER_MAP_T5 = {
+	"id": "faster_map_t5",
+	"type": PowerUpType.MALUS,
+	"name": "Faster Map V",
+	"description": "Map rotation speed increased by 100%",
+	"family": "faster_map",
+	"tier": 5,
+	"repeatable": false
+}
+
 const MALUS_UNZOOM_T1 = {
 	"id": "unzoom_t1",
 	"type": PowerUpType.MALUS,
@@ -160,6 +240,26 @@ const MALUS_UNZOOM_T3 = {
 	"description": "Map zoom reduced by 50%",
 	"family": "zoom",
 	"tier": 3,
+	"repeatable": false
+}
+
+const MALUS_UNZOOM_T4 = {
+	"id": "unzoom_t4",
+	"type": PowerUpType.MALUS,
+	"name": "Unzoom IV",
+	"description": "Map zoom reduced by 65%",
+	"family": "zoom",
+	"tier": 4,
+	"repeatable": false
+}
+
+const MALUS_UNZOOM_T5 = {
+	"id": "unzoom_t5",
+	"type": PowerUpType.MALUS,
+	"name": "Unzoom V",
+	"description": "Map zoom reduced by 80%",
+	"family": "zoom",
+	"tier": 5,
 	"repeatable": false
 }
 
@@ -193,6 +293,26 @@ const MALUS_VERTICAL_MOVEMENT_T3 = {
 	"repeatable": false
 }
 
+const MALUS_VERTICAL_MOVEMENT_T4 = {
+	"id": "vertical_movement_t4",
+	"type": PowerUpType.MALUS,
+	"name": "Vertical Drift IV",
+	"description": "Map drifts erratically up and down",
+	"family": "vertical_movement",
+	"tier": 4,
+	"repeatable": false
+}
+
+const MALUS_VERTICAL_MOVEMENT_T5 = {
+	"id": "vertical_movement_t5",
+	"type": PowerUpType.MALUS,
+	"name": "Vertical Drift V",
+	"description": "Map drifts wildly up and down",
+	"family": "vertical_movement",
+	"tier": 5,
+	"repeatable": false
+}
+
 # ===== POWER-UP POOLS =====
 
 # All bonuses available for selection
@@ -200,12 +320,18 @@ const ALL_BONUSES = [
 	BONUS_SLOWER_MAP_T1,
 	BONUS_SLOWER_MAP_T2,
 	BONUS_SLOWER_MAP_T3,
+	BONUS_SLOWER_MAP_T4,
+	BONUS_SLOWER_MAP_T5,
 	BONUS_ZOOM_T1,
 	BONUS_ZOOM_T2,
 	BONUS_ZOOM_T3,
+	BONUS_ZOOM_T4,
+	BONUS_ZOOM_T5,
 	BONUS_EXTRA_XP_T1,
 	BONUS_EXTRA_XP_T2,
-	BONUS_EXTRA_XP_T3
+	BONUS_EXTRA_XP_T3,
+	BONUS_EXTRA_XP_T4,
+	BONUS_EXTRA_XP_T5
 ]
 
 # All maluses available for selection
@@ -213,12 +339,18 @@ const ALL_MALUSES = [
 	MALUS_FASTER_MAP_T1,
 	MALUS_FASTER_MAP_T2,
 	MALUS_FASTER_MAP_T3,
+	MALUS_FASTER_MAP_T4,
+	MALUS_FASTER_MAP_T5,
 	MALUS_UNZOOM_T1,
 	MALUS_UNZOOM_T2,
 	MALUS_UNZOOM_T3,
+	MALUS_UNZOOM_T4,
+	MALUS_UNZOOM_T5,
 	MALUS_VERTICAL_MOVEMENT_T1,
 	MALUS_VERTICAL_MOVEMENT_T2,
-	MALUS_VERTICAL_MOVEMENT_T3
+	MALUS_VERTICAL_MOVEMENT_T3,
+	MALUS_VERTICAL_MOVEMENT_T4,
+	MALUS_VERTICAL_MOVEMENT_T5
 ]
 
 # ===== HELPER FUNCTIONS =====

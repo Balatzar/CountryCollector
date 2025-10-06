@@ -46,14 +46,14 @@ var acquired_cards: Array[Dictionary] = []
 
 # Zoom tracking
 var current_zoom_level: int = 0  # Net zoom level: positive = zoom bonus, negative = unzoom malus, 0 = neutral
-var zoom_bonus_tier: int = 0  # Track highest zoom bonus tier acquired (0-3)
-var unzoom_malus_tier: int = 0  # Track highest unzoom malus tier acquired (0-3)
+var zoom_bonus_tier: int = 0  # Track highest zoom bonus tier acquired (0-5)
+var unzoom_malus_tier: int = 0  # Track highest unzoom malus tier acquired (0-5)
 
 # Vertical drift tracking
-var vertical_drift_tier: int = 0  # Track highest vertical movement malus tier (0-3)
+var vertical_drift_tier: int = 0  # Track highest vertical movement malus tier (0-5)
 
 # Extra XP bonus tracking
-var extra_xp_bonus_tier: int = 0  # Track highest extra XP bonus tier (0-3)
+var extra_xp_bonus_tier: int = 0  # Track highest extra XP bonus tier (0-5)
 
 # Loading state
 var loading_in_progress: bool = false
@@ -259,6 +259,10 @@ func acquire_card(card_data: Dictionary) -> void:
 			vertical_drift_tier = max(vertical_drift_tier, 2)
 		elif card_id == "vertical_movement_t3":
 			vertical_drift_tier = max(vertical_drift_tier, 3)
+		elif card_id == "vertical_movement_t4":
+			vertical_drift_tier = max(vertical_drift_tier, 4)
+		elif card_id == "vertical_movement_t5":
+			vertical_drift_tier = max(vertical_drift_tier, 5)
 
 		# Emit signal with new drift amplitude
 		var amplitude = get_vertical_drift_amplitude()
@@ -272,6 +276,10 @@ func acquire_card(card_data: Dictionary) -> void:
 			unzoom_malus_tier = max(unzoom_malus_tier, 2)
 		elif card_id == "unzoom_t3":
 			unzoom_malus_tier = max(unzoom_malus_tier, 3)
+		elif card_id == "unzoom_t4":
+			unzoom_malus_tier = max(unzoom_malus_tier, 4)
+		elif card_id == "unzoom_t5":
+			unzoom_malus_tier = max(unzoom_malus_tier, 5)
 
 		# Recalculate net zoom level (zoom bonus - unzoom malus)
 		_update_net_zoom_level()
@@ -288,6 +296,10 @@ func acquire_card(card_data: Dictionary) -> void:
 			zoom_bonus_tier = max(zoom_bonus_tier, 2)
 		elif card_id == "zoom_t3":
 			zoom_bonus_tier = max(zoom_bonus_tier, 3)
+		elif card_id == "zoom_t4":
+			zoom_bonus_tier = max(zoom_bonus_tier, 4)
+		elif card_id == "zoom_t5":
+			zoom_bonus_tier = max(zoom_bonus_tier, 5)
 
 		# Recalculate net zoom level (zoom bonus - unzoom malus)
 		_update_net_zoom_level()
@@ -304,6 +316,10 @@ func acquire_card(card_data: Dictionary) -> void:
 			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 2)
 		elif card_id == "extra_xp_t3":
 			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 3)
+		elif card_id == "extra_xp_t4":
+			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 4)
+		elif card_id == "extra_xp_t5":
+			extra_xp_bonus_tier = max(extra_xp_bonus_tier, 5)
 		print("[GameState] Extra XP bonus tier updated: ", extra_xp_bonus_tier)
 
 
@@ -345,7 +361,11 @@ func get_rotation_speed_multiplier() -> float:
 	var multiplier := 1.0
 
 	# Check for slower map bonuses (reduce speed)
-	if has_card("Slower Map III"):
+	if has_card("Slower Map V"):
+		multiplier *= 0.2  # 80% reduction
+	elif has_card("Slower Map IV"):
+		multiplier *= 0.35  # 65% reduction
+	elif has_card("Slower Map III"):
 		multiplier *= 0.5  # 50% reduction
 	elif has_card("Slower Map II"):
 		multiplier *= 0.7  # 30% reduction
@@ -353,7 +373,11 @@ func get_rotation_speed_multiplier() -> float:
 		multiplier *= 0.85  # 15% reduction
 
 	# Check for faster map maluses (increase speed)
-	if has_card("Faster Map III"):
+	if has_card("Faster Map V"):
+		multiplier *= 2.0  # 100% increase
+	elif has_card("Faster Map IV"):
+		multiplier *= 1.8  # 80% increase
+	elif has_card("Faster Map III"):
 		multiplier *= 1.6  # 60% increase
 	elif has_card("Faster Map II"):
 		multiplier *= 1.4  # 40% increase
@@ -373,7 +397,11 @@ func get_globe_scale_multiplier() -> float:
 
 	if excess_unzoom > 0:
 		# Apply unzoom scaling based on the excess tiers
-		if excess_unzoom >= 3:
+		if excess_unzoom >= 5:
+			multiplier *= 0.2  # 80% reduction (equivalent to Unzoom V)
+		elif excess_unzoom == 4:
+			multiplier *= 0.35  # 65% reduction (equivalent to Unzoom IV)
+		elif excess_unzoom == 3:
 			multiplier *= 0.5  # 50% reduction (equivalent to Unzoom III)
 		elif excess_unzoom == 2:
 			multiplier *= 0.7  # 30% reduction (equivalent to Unzoom II)
@@ -392,6 +420,10 @@ func get_vertical_drift_amplitude() -> float:
 			return 40.0  # ±40px
 		3:
 			return 60.0  # ±60px
+		4:
+			return 80.0  # ±80px
+		5:
+			return 100.0  # ±100px
 		_:
 			return 0.0  # No drift
 
@@ -405,6 +437,10 @@ func get_extra_xp_bonus() -> int:
 			return 10
 		3:
 			return 15
+		4:
+			return 20
+		5:
+			return 25
 		_:
 			return 0
 
@@ -414,10 +450,10 @@ func _update_net_zoom_level() -> void:
 	var old_zoom_level = current_zoom_level
 
 	# Calculate net zoom: zoom bonus tier - unzoom malus tier
-	# Result can be -3 to +3
+	# Result can be -5 to +5
 	var net_level = zoom_bonus_tier - unzoom_malus_tier
 
-	# Clamp to valid zoom controller range (0-3)
+	# Clamp to valid zoom controller range (0-5)
 	# If net is negative or zero, no zoom ability
 	# If net is positive, that's the zoom level
 	current_zoom_level = max(0, net_level)
