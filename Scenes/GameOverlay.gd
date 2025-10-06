@@ -4,6 +4,7 @@ extends CanvasLayer
 
 # Node references
 @onready var dart_container: HBoxContainer = $MarginContainer/LayoutContainer/CenterAndRightContainer/TopBar/DartPanel/DartVBox/DartContainer
+@onready var countries_title: Label = $MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel/CountriesVBox/CountriesTitle
 @onready var countries_list: VBoxContainer = $MarginContainer/LayoutContainer/CenterAndRightContainer/RightPanel/CountriesVBox/ScrollContainer/CountriesList
 @onready var bonus_panel: PanelContainer = $MarginContainer/LayoutContainer/LeftPanel/BonusPanel
 @onready var bonus_container: VBoxContainer = $MarginContainer/LayoutContainer/LeftPanel/BonusPanel/BonusVBox/BonusEffectsList
@@ -34,6 +35,9 @@ func _ready() -> void:
 
 	# Initialize bonus/malus displays
 	_update_card_displays()
+
+	# Update country counter
+	_update_country_title()
 
 
 func _setup_dart_counter() -> void:
@@ -71,6 +75,7 @@ func _setup_dart_counter() -> void:
 
 func _on_country_collected(country_id: String) -> void:
 	_add_country_to_list(country_id)
+	_update_country_title()
 
 
 func _on_darts_changed(remaining_darts: int) -> void:
@@ -188,3 +193,10 @@ func _on_zoom_bonus_acquired(zoom_level: int) -> void:
 	"""Show/hide the zoom help panel based on zoom level"""
 	# Show help panel only if zoom is active (level > 0)
 	zoom_help_panel.visible = (zoom_level > 0)
+
+
+func _update_country_title() -> void:
+	"""Update the countries title with current count"""
+	var collected := GameState.collected_countries.size()
+	var total := GameState.all_countries.size()
+	countries_title.text = "COUNTRIES (%d/%d)" % [collected, total]
