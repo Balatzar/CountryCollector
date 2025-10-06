@@ -98,11 +98,11 @@ var level: int = 1
 
 # XP rewards based on country size
 const XP_REWARDS = {
-	CountryNames.Size.MICROSCOPIC: 150,
-	CountryNames.Size.SMALL: 80,
-	CountryNames.Size.MEDIUM: 60,
-	CountryNames.Size.BIG: 40,
-	CountryNames.Size.HUGE: 10
+	CountryNames.Size.MICROSCOPIC: 80,
+	CountryNames.Size.SMALL: 60,
+	CountryNames.Size.MEDIUM: 40,
+	CountryNames.Size.BIG: 30,
+	CountryNames.Size.HUGE: 20
 }
 
 
