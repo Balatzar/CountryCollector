@@ -128,6 +128,10 @@ func _on_country_collected(country_id: String) -> void:
 	# Mark that this dart hit a country
 	dart_hit_country = true
 
+	# Rebuild map copies to reflect the new white color
+	if copies_created and map_copy != null:
+		_rebuild_map_copy()
+
 	# Show hit notification at dart landing position
 	GameState.show_notification("Hit!", GameState.last_dart_position, COLOR_HIT)
 
@@ -153,10 +157,6 @@ func _on_country_collected(country_id: String) -> void:
 	await get_tree().create_timer(0.1).timeout
 	var fun_msg = FUN_SUCCESS_MESSAGES[randi() % FUN_SUCCESS_MESSAGES.size()]
 	GameState.show_notification(fun_msg, GameState.last_dart_position, COLOR_FUN)
-
-	# Rebuild map copies to reflect the new white color
-	if copies_created and map_copy != null:
-		_rebuild_map_copy()
 
 
 func _get_size_text(size: CountryNames.Size) -> String:
